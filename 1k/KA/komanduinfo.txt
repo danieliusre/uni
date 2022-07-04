@@ -1,0 +1,34 @@
+Apdoroti MOV, OUT, NOT, RCR, XLAT
+
+
+MOV - 1000 10dw + mod reg r/m [poslinkis] ;
+d=0, reg->r/m
+d=1, r/m->reg
+
+OUT - 1110 011w + portas ;(isvedimas i porta)
+w=0, AL
+w=1, AX
+
+NOT - 1111 011w + mod 010 r/m [poslinkis] ;(neigimas) 
+
+RCR - 1101 00vw + mod 011 r/m [poslinkis] ;(Rotate Right through Carry)
+
+XLAT - 1101 0111 (transLATe - kodo paemimas pagal poslinki)
+Komanda naudojama duomenų perkodavimui. Registre BX esantis adresas rodo į
+perkodavimo lentelę. Imamas registre AL esantis baitas ir jis traktuojamas kaip
+poslinkis nuo perkodavimo lentelės pradžios. Vykdant komandą, reikšmė, esanti
+perkodavimo lentelėje su poslinkiu, nusiunčiama į registrą AL. 
+
+
+Lauko reg reikšmės:
+reg		w = 0    	w = 1
+000		AL 			AX
+001 	CL 			CX
+010 	DL			DX
+011		BL 			BX
+100		AH			SP
+101 	CH			BP
+110 	DH			SI
+111 	BH			DI
+
+Lauko r/m reikšmės: 

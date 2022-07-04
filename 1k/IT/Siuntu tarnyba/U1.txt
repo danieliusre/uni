@@ -1,0 +1,11 @@
+10 63
+Siuntuva   2 3
+Auda       3 -1
+Kostisa    -3 -2
+Linga      3 0
+Austuva    -2 4
+Siuntuva l 2 3
+Auda sos   3 -1
+Kostisa5   -3 -2
+Linga ad   3 0
+Ausruva    -2 4

@@ -1,0 +1,5 @@
+Prognoze: Manau, jog visos programos kurimas uztruks apie 6h.
+Nuskaitymas ir irasymas i faila ~ 1h.
+Ismokti teisingai naudoti pointerius + dinamiska atminti (malloc/calloc) ~ 2h.
+Kodo rasymas ~ 1h.
+Debuginimas ~ 2h, nes esu isitikines, jog is karto programos parasyti nepavyks, bus daug klaidu.

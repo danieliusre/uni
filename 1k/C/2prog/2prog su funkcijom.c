@@ -1,0 +1,53 @@
+//Nr. 2016028 Danielius Rekus danielius.rekus@mif.stud.vu.lt, 4
+
+#include <stdio.h>
+#include <stdlib.h>
+int Valid(int skaicius)
+{
+    while(scanf("%d", &skaicius)==0||getchar()!='\n')
+        {
+            scanf("%*[^\n]");
+            printf("Ivestis netinka, iveskite sveika skaiciu:\n");
+        }
+    return skaicius;
+}
+void GetNumber(int n, int skaiciai[n], int skaicius)
+{
+    for(int i=0; i<n; i++)
+    {
+        skaiciai[i] = Valid(skaicius);
+    }
+}
+int main()
+{
+    int skaicius, n;
+    int skaiciai[n];
+    printf("Iveskite sveika skaiciu n:\n");
+    n = Valid(skaicius);
+    printf("Iveskite n sveiku skaiciu:\n");
+    GetNumber(n, skaiciai, skaicius);
+    int suma;
+    for(int i=0; i<n; i++)
+    {
+        suma+=skaiciai[i];
+    }
+    float vidurkis;
+    int mazesnis, didesnis;
+    vidurkis =(float)suma/n;
+    for(int i=0; i<n; i++)
+    {
+        if((float)skaiciai[i]<vidurkis)
+        {
+            mazesnis=skaiciai[i];
+        }
+        else
+        {
+            didesnis=skaiciai[i];
+            break;
+        }
+    }
+
+
+    printf("%d %d\n", mazesnis, didesnis);
+    return 0;
+}

@@ -1,0 +1,9 @@
+Nr. 2016028 Danielius Rekus danielius.rekus@mif.stud.vu.lt, 4
+
+Pats užduoties atlikimas užtruko apie valandą, tačiau dėl (tada) nežinomų priežasčių, bug'ų tvarkymas užemė dar ~3h.
+Pagrindinė problema buvo ta, jog, kai rašiau, dar nesimokėme naudoti dinaminių [n] masyvų, su kuriuo bandžiau rašyti, o dėl jo neveikė visa programa.
+
+Programą keisti bandžiau apie 2h, niekas nepadėjo, kol galiausiai pakeičiau masyvą į statinį ir programa veikė.
+
+Mano nuomone mokymo procesas normalus - jei turime klausimų ar kyla neaiškumų, destytojas i juos atsako, padeda, tačiau manau, kad paskaitų metu galėtume
+giliau aptarti bei gauti pavyzdžių apie temas, kurias dabar einame per teorines paskaitas.

@@ -1,0 +1,8 @@
+PATRICIA            0 30
+DONNA               1 52
+MARY                2 29
+HELEN               3 5
+BETTY               3 11
+SUSAN               6 31
+MARGARET            8 44
+LISA                10 56

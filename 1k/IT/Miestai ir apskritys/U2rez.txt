@@ -1,0 +1,10 @@
+9
+Alytaus      1 21
+Kauno        1 9
+Marijampoles 1 26
+Utenos       1 17
+Vilniaus     1 4
+Taureges     2 41
+Klaipedos    3 9
+Siauliu      6 25
+Panevezio    9 9

@@ -1,0 +1,7 @@
+set PATH=C:\MinGW\bin;%PATH%
+cd desktop
+gcc "name".c
+a
+
+Perduodant per reiksme, gauni kintamojo reiksme, bet jos negali keisti, ja gali naudoti kitiem tikslmas, 
+o perduodant per adresa, gauni ir kintamojo reiksme, ir gali ja keisti.

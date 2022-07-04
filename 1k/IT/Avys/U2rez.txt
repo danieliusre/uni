@@ -1,0 +1,21 @@
+NANCY     
+BETTY      9
+JENNIFER   7
+MARY       7
+DOROTHY    6
+ELIZABETH  6
+MICHELLE   6
+RUTH       6
+BARBARA    5
+MARIA      5
+SANDRA     5
+HELEN      4
+KAREN      4
+LISA       4
+SUSAN      4
+DONNA      3
+PATRICIA   3
+SHARON     3
+CAROL      2
+LINDA      2
+MARGARET   1
