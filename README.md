@@ -20,7 +20,7 @@ Vilnius University Software Engineering
 - Database management systems
 - Functional programming (Haskell)
 - Mathematical logic
-- Software engineering I/II (C# .NET)
+- Software engineering I/II (C# .NET) - repository "Wasted"
 
 4th Semester:
 - Computer networks
