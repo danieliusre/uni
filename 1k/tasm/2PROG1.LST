@@ -1,0 +1,370 @@
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 1
+2prog1.ASM
+
+
+
+      1	0000			     .model small
+      2	0000			     .stack 100h
+      3
+      4	0000			     .data
+      5	0000  0D 0A 24			 endl db 0Dh, 0Ah, 24h
+      6
+      7	0003  0100*(??)			 filename db 256 dup(?)
+      8
+      9	0103  0000			 in_fh dw 0000h
+     10
+     11	0105  01*(??)			 buff db 1 dup(?)
+     12	0106  01*(??)			 prevch	db 1 dup(?)
+     13
+     14	0107  0000			 char_nr dw 0
+     15	0109  0000			 cap_nr	dw 0
+     16	010B  0000			 low_nr	dw 0
+     17	010D  0000			 word_nr dw 0
+     18
+     19	010F  53 69 6D 62 6F 6C	69+	 msg1 db "Simboliu skaicius tekste: $"
+     20	      75 20 73 6B 61 69	63+
+     21	      69 75 73 20 74 65	6B+
+     22	      73 74 65 3A 20 24
+     23	012A  5A 6F 64 7A 69 75	20+	 msg4 db "Zodziu skaicius tekste: $"
+     24	      73 6B 61 69 63 69	75+
+     25	      73 20 74 65 6B 73	74+
+     26	      65 3A 20 24
+     27	0143  4D 61 7A 75 6A 75	20+	 msg3 db "Mazuju raidziu skaicius tekste: $"
+     28	      72 61 69 64 7A 69	75+
+     29	      20 73 6B 61 69 63	69+
+     30	      75 73 20 74 65 6B	73+
+     31	      74 65 3A 20 24
+     32	0164  44 69 64 7A 69 75	6A+	 msg2 db "Didziuju raidziu skaicius tekste: $"
+     33	      75 20 72 61 69 64	7A+
+     34	      69 75 20 73 6B 61	69+
+     35	      63 69 75 73 20 74	65+
+     36	      6B 73 74 65 3A 20	24
+     37
+     38	0187			     .code
+     39
+     40	0000			     start:
+     41	0000  BA 0000s			 mov dx,@data
+     42	0003  8E DA			 mov ds,dx
+     43				     ;-----------------------------------------------------FAILO VARDO GAVIMAS IS KOMANDINES	    +
+     44				     EILUTES-----------------------------------------------
+     45
+     46	0005  33 C9			     xor cx, cx
+     47	0007  26: 8A 0E	0080		     mov cl, es:[80h]	     ; eilutes ilgis
+     48	000C  BE 0082			     mov si, 82h	     ; 1 eilutes simbolis
+     49
+     50	000F			     pradzia:
+     51	000F  32 E4			     xor ah, ah
+     52	0011  BB 0003r			     mov bx, offset filename
+     53	0014			     loop2:
+     54	0014  26: 8A 04			     mov al, es:[si]
+     55	0017  3C 20			     cmp al, ' '
+     56	0019  74 0B			     je	yra
+     57	001B  3C 0D			     cmp al, 13	; EOL
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 2
+2prog1.ASM
+
+
+
+     58	001D  74 07			     je	yra
+     59	001F  88 07			     mov [bx], al
+     60	0021  FE C4			     inc ah
+     61	0023  EB 23 90			     jmp eloop2
+     62
+     63	0026			     yra:
+     64	0026  51			     push cx
+     65
+     66	0027  8A CC			     mov cl, ah
+     67	0029  B4 40			     mov ah, 40h
+     68	002B  BB 0001			     mov bx, 1
+     69	002E  BA 0003r			     mov dx, offset filename
+     70	0031  CD 21			     int 21h
+     71
+     72	0033  B1 02			     mov cl, 02h
+     73	0035  B4 40			     mov ah, 40h
+     74	0037  BB 0001			     mov bx, 1
+     75	003A  BA 0000r			     mov dx, offset endl
+     76	003D  CD 21			     int 21h
+     77
+     78	003F  BB 0002r			     mov bx, offset [filename -	1]
+     79	0042  59			     pop cx
+     80	0043  32 E4			     xor ah, ah
+     81
+     82	0045  EB 08 90			     jmp open
+     83
+     84	0048			     eloop2:
+     85	0048  43			     inc bx
+     86	0049  46			     inc si
+     87	004A  E2 C8			     loop loop2
+     88
+     89	004C  E9 00B4		     jmp pabaiga
+     90				     ;------------------------------------------FAILO ATIDARYMAS-----------------------
+     91	004F			     open:
+     92	004F  56			 push si
+     93	0050  51			 push cx
+     94	0051  53			 push bx
+     95
+     96	0052  B8 3D00			 mov ax, 3d00h
+     97	0055  BA 0003r			 lea dx, filename
+     98	0058  CD 21			 int 21h
+     99	005A  A3 0103r			 mov in_fh,ax
+    100
+    101				     ;--------------------------------SKAITYMAS	IS FAILO----------------------------------------
+    102	005D			     skaitymas:
+    103	005D  BA 0105r			 lea dx,buff
+    104	0060  B8 3F00			 mov ax,3f00h		     ;read file
+    105	0063  8B 1E 0103r		 mov bx,in_fh
+    106	0067  B9 0001			 mov cx,01h
+    107	006A  CD 21			 int 21h
+    108
+    109	006C  80 3E 0105r 0D		 cmp buff, 0Dh		     ;tikrina ar charas	ne endl
+    110	0071  74 10			 je zodis
+    111	0073  80 3E 0105r 0A		 cmp buff, 0Ah
+    112	0078  74 09			 je zodis
+    113	007A  8B 0E 0107r		 mov cx, char_nr	     ;char counteris
+    114	007E  41			 inc cx
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 3
+2prog1.ASM
+
+
+
+    115	007F  89 0E 0107r		 mov char_nr, cx
+    116					 ;mov cx, 01h
+    117
+    118	0083			     zodis:
+    119	0083  80 3E 0105r 20		 cmp buff, ' '
+    120	0088  74 7F			 je tarpas1
+    121	008A  80 3E 0105r 0D		 cmp buff, 0Dh
+    122	008F  74 7D			 je newline1
+    123				     ;--------------------------TIKRINA	AR RAIDE						    +
+    124				     MAZOJI/DIDZIOJI--------------------------------------------------------
+    125	0091			     cap:
+    126	0091  80 3E 0105r 7A		 cmp buff, 'z'
+    127	0096  77 15			 ja failopab
+    128	0098  80 3E 0105r 61		 cmp buff, 'a'
+    129	009D  73 72			 jnb mazoji1		     ; mazoji z-a
+    130	009F  80 3E 0105r 5A		 cmp buff, 'Z'
+    131	00A4  77 07			 ja failopab
+    132	00A6  80 3E 0105r 41		 cmp buff, 'A'
+    133	00AB  73 67			 jnb didzioji1		     ; didzioji	Z-A
+    134
+    135	00AD			     failopab:
+    136
+    137	00AD  8A 16 0105r		 mov dl, buff
+    138	00B1  88 16 0106r		 mov prevch, dl
+    139
+    140	00B5  3D 0000			 cmp ax, 0
+    141	00B8  75 A3			 jnz skaitymas
+    142
+    143	00BA  B8 3E00			 mov ax, 3e00h		     ;close file
+    144	00BD  8B 1E 0103r		 mov bx, in_fh
+    145	00C1  CD 21			 int 21h
+    146				     ;------------------------SPAUSDINA	TEKSTO							    +
+    147				     DUOMENIS--------------------------------------------------------------
+    148
+    149	00C3  BA 010Fr			 mov dx, offset	msg1
+    150	00C6  B4 09			 mov ah, 09h
+    151	00C8  CD 21			 int 21h
+    152
+    153	00CA  8B 16 0107r		 mov dx, char_nr	     ;spausdina	simboliu skaiciu
+    154	00CE  4A			 dec dx
+    155	00CF  E8 0083			 call bin2dec
+    156
+    157	00D2  BA 0164r			 mov dx, offset	msg2
+    158	00D5  B4 09			 mov ah, 09h
+    159	00D7  CD 21			 int 21h
+    160
+    161	00D9  8B 16 0109r		 mov dx, cap_nr		     ;spausdina	didziuju raidziu skaiciu
+    162	00DD  E8 0075			 call bin2dec
+    163
+    164	00E0  BA 0143r			 mov dx, offset	msg3
+    165	00E3  B4 09			 mov ah, 09h
+    166	00E5  CD 21			 int 21h
+    167
+    168	00E7  8B 16 010Br		 mov dx, low_nr		     ;spausdina	mazuju raidziu skaiciu
+    169	00EB  E8 0067			 call bin2dec
+    170
+    171	00EE  BA 012Ar			 mov dx, offset	msg4
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 4
+2prog1.ASM
+
+
+
+    172	00F1  B4 09			 mov ah, 09h
+    173	00F3  CD 21			 int 21h
+    174
+    175	00F5  8B 16 010Dr		 mov dx, word_nr	     ;spausdina	zodziu skaiciu
+    176	00F9  42			 inc dx
+    177	00FA  E8 0058			 call bin2dec
+    178
+    179	00FD  5B			 pop bx
+    180	00FE  59			 pop cx
+    181	00FF  5E			 pop si
+    182
+    183	0100  E9 FF45			 jmp eloop2
+    184				     ;-----------------------------------------------------------------------------------------------
+    185				     ---------------
+    186	0103			     pabaiga:
+    187	0103  B4 4C			 mov ah, 4ch		     ;exit
+    188	0105  B0 00			 mov al, 0
+    189	0107  CD 21			 int 21h
+    190				     ;----------------------------TARPINIAI							    +
+    191				     JUMPAI------------------------------------------------------
+    192	0109			     tarpas1:
+    193	0109  EB 0C 90			     jmp tarpas
+    194	010C			     cap1:
+    195	010C  EB 83			     jmp cap
+    196	010E			     newline1:
+    197	010E  EB 1A 90			     jmp newline
+    198	0111			     mazoji1:
+    199	0111  EB 2A 90			     jmp mazoji
+    200	0114			     didzioji1:
+    201	0114  EB 33 90			     jmp didzioji
+    202				     ;------------------------------------FUNKCIJOS--------------------------------------------------
+    203				     ------------
+    204	0117			     tarpas:
+    205	0117  80 3E 0106r 20		 cmp prevch, ' '
+    206	011C  74 EE			 je cap1
+    207	011E  8B 0E 010Dr		 mov cx, word_nr
+    208	0122  41			 inc cx
+    209	0123  89 0E 010Dr		 mov word_nr, cx
+    210	0127  E9 FF67			 jmp cap
+    211
+    212	012A			     newline:
+    213	012A  80 3E 0106r 0A		 cmp prevch, 0Ah
+    214	012F  74 DB			 je cap1
+    215	0131  8B 0E 010Dr		 mov cx, word_nr
+    216	0135  41			 inc cx
+    217	0136  89 0E 010Dr		 mov word_nr, cx
+    218	013A  E9 FF54			 jmp cap
+    219				     ;-----------------------------------MAZUJU/DIDZIUJU RAIDZIU				    +
+    220				     COUNTERIS---------------------------------
+    221	013D			     mazoji:
+    222	013D  8B 0E 010Br		     mov cx, low_nr
+    223	0141  41			     inc cx
+    224	0142  89 0E 010Br		     mov low_nr, cx
+    225	0146  E9 FF64			     jmp failopab
+    226
+    227	0149			     didzioji:
+    228	0149  8B 0E 0109r		     mov cx, cap_nr
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 5
+2prog1.ASM
+
+
+
+    229	014D  41			     inc cx
+    230	014E  89 0E 0109r		     mov cap_nr, cx
+    231	0152  E9 FF58			     jmp failopab
+    232				     ;-----------------------------------BINARY	TO DECIMAL					    +
+    233				     FUNKCIJA-----------------------------------------
+    234	0155			     bin2dec:
+    235
+    236	0155  50			 push	 ax
+    237	0156  51			 push	 cx
+    238	0157  52			 push	 dx
+    239	0158  56			 push	 si
+    240	0159  8B C2			 mov	 ax,dx		     ;Skaicius prasideda dx
+    241	015B  BE 000A			 mov	 si,10		     ;decimal 10
+    242	015E  33 C9			 xor	 cx,cx		     ;Pradeda skaiciavima nuo 0
+    243
+    244	0160				 Nenulis:
+    245	0160  33 D2			 xor	 dx,dx		     ;Isvalo liekada
+    246	0162  F7 F6			 div	 si
+    247	0164  52			 push	 dx		     ;Issaugo skaicius atbuline	tvarka
+    248	0165  41			 inc	 cx
+    249	0166  0B C0			 or	 ax,ax		     ;Tikrina, ar pradinis skaicius 0
+    250	0168  75 F6			 jnz	 Nenulis	     ;Jei ne, loopina
+    251
+    252	016A  B4 02			 mov	 ah,02h
+    253
+    254	016C				 rasymas:
+    255	016C  5A			 pop	 dx
+    256	016D  83 C2 30			 add	 dx,"0"		     ;Pavercia i ascii
+    257	0170  CD 21			 int	 21h		     ;Printina dec skaiciu
+    258	0172  E2 F8			 loop	 rasymas
+    259
+    260	0174  BA 0000r			 mov dx, offset	endl
+    261	0177  B4 09			 mov ah, 09h
+    262	0179  CD 21			 int 21h
+    263
+    264	017B				 decpabaiga:
+    265	017B  5E			 pop	 si
+    266	017C  5A			 pop	 dx
+    267	017D  59			 pop	 cx
+    268	017E  58			 pop	 ax
+    269	017F  C3		     RET
+    270
+    271				     end start
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 6
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "12/04/20"
+??FILENAME			  Text	 "2prog1  "
+??TIME				  Text	 "15:33:25"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 2PROG1
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+BIN2DEC				  Near	 _TEXT:0155
+BUFF				  Byte	 DGROUP:0105
+CAP				  Near	 _TEXT:0091
+CAP1				  Near	 _TEXT:010C
+CAP_NR				  Word	 DGROUP:0109
+CHAR_NR				  Word	 DGROUP:0107
+DECPABAIGA			  Near	 _TEXT:017B
+DIDZIOJI			  Near	 _TEXT:0149
+DIDZIOJI1			  Near	 _TEXT:0114
+ELOOP2				  Near	 _TEXT:0048
+ENDL				  Byte	 DGROUP:0000
+FAILOPAB			  Near	 _TEXT:00AD
+FILENAME			  Byte	 DGROUP:0003
+IN_FH				  Word	 DGROUP:0103
+LOOP2				  Near	 _TEXT:0014
+LOW_NR				  Word	 DGROUP:010B
+MAZOJI				  Near	 _TEXT:013D
+MAZOJI1				  Near	 _TEXT:0111
+MSG1				  Byte	 DGROUP:010F
+MSG2				  Byte	 DGROUP:0164
+MSG3				  Byte	 DGROUP:0143
+MSG4				  Byte	 DGROUP:012A
+NENULIS				  Near	 _TEXT:0160
+NEWLINE				  Near	 _TEXT:012A
+NEWLINE1			  Near	 _TEXT:010E
+OPEN				  Near	 _TEXT:004F
+PABAIGA				  Near	 _TEXT:0103
+PRADZIA				  Near	 _TEXT:000F
+PREVCH				  Byte	 DGROUP:0106
+RASYMAS				  Near	 _TEXT:016C
+SKAITYMAS			  Near	 _TEXT:005D
+START				  Near	 _TEXT:0000
+TARPAS				  Near	 _TEXT:0117
+TARPAS1				  Near	 _TEXT:0109
+WORD_NR				  Word	 DGROUP:010D
+YRA				  Near	 _TEXT:0026
+ZODIS				  Near	 _TEXT:0083
+Turbo Assembler	 Version 3.1	    12/04/20 15:33:25	    Page 7
+Symbol Table
+
+
+
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  0187 Word	  Public  DATA
+_TEXT				  16  0180 Word	  Public  CODE
+
