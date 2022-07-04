@@ -1,0 +1,8 @@
+PASKOLOS ATASKAITA
+Paskolos tipas: Anuiteto
+Paskolos suma: 1000,00
+Periodas (mėn): 35
+Metinis procentas: 5,00
+Išmoka: 30,76
+Bankas uždirbo(€): 76,77
+Viso sumokėta(€): 1076,77

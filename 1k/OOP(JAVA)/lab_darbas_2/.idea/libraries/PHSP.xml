@@ -1,0 +1,37 @@
+<component name="libraryTable">
+  <library name="PHSP">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-fr_CA_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-de_DE_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-es_MX_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-pt_BR_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-ru_RU_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-en_AE_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-Core_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-da_DK_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-zh_CN_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-hu_HU_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-en_US_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-nl_NL_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-en_GB_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-ko_KR_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-cs_CZ_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-es_ES_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-nb_NO_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-uk_UA_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-en_IL_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-ja_JP_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-tr_TR_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-it_IT_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-pl_PL_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-fi_FI_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-Support.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-fr_MA_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-sv_SE_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-fr_FR_x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/PHSP/AdobePhotoshop21-zh_TW_x64.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

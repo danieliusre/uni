@@ -1,0 +1,8 @@
+PASKOLOS ATASKAITA
+Paskolos tipas:         Anuiteto
+Suma:                   10000,00
+Terminas (mën):         360
+Metinis procentas:      3,50
+Iðmokos dydis:          44,90
+Bankas uþdirbo(€):      6165,61
+Viso sumokëta(€):       16165,57

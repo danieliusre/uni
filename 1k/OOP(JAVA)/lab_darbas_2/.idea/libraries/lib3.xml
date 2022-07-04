@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lib3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/Groovy/lib/groovy-jps.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/Groovy/lib/groovy-constants-rt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/Groovy/lib/Groovy.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/Groovy/lib/groovy-rt.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

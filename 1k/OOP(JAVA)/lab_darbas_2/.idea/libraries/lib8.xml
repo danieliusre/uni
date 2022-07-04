@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="lib8">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/javaFX/lib/resources_en.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/javaFX/lib/javaFX.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/javaFX/lib/javaFX-jps.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/javaFX/lib/javaFX-common.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="lib39">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/filePrediction/lib/resources_en.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/filePrediction/lib/filePrediction.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/filePrediction/lib/file-prediction-model-0.2.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

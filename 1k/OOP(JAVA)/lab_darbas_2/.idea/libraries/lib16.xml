@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="lib16">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/git4idea/lib/git4idea-rt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/git4idea/lib/git4idea.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/git4idea/lib/resources_en.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

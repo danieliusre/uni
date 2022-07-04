@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="android-jps-plugin">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/android/lib/jps/android-jps-plugin.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="ACR">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/ACR/AdobeCameraRaw8.0All-x64.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/ACR/AdobeCameraRawProfile8.0All.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/ACR/CameraRawRIBSCoExistPackage.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/ACR/AdobeCameraRaw8.0All.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

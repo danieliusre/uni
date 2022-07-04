@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="tool">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/tools/MovieMaker/tool/MovieMaker.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/tools/MovieMaker/tool/jai_imageio.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

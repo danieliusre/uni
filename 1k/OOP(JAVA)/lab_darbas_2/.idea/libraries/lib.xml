@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/lib/ant.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/lib/ant-launcher.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/lib/jna-platform.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/lib/pde.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/lib/jna.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

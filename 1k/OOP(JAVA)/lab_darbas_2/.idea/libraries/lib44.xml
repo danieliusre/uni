@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="lib44">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/jfr.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/jfxswt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/plugin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/rt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/resources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/charsets.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/deploy.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/jce.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/management-agent.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/java/lib/jsse.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

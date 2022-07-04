@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="plexus-classworlds-2.6.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/IntelliJ IDEA Community Edition 2020.3.2/plugins/maven/lib/maven3/boot/plexus-classworlds-2.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

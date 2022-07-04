@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="COPS">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COPS/AdobeColor_VideoProfilesCS_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COPS/AdobeColor_Photoshop_1_0-mul.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

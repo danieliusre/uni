@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="dxfviewer">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/libraries/dxf/dxfviewer.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

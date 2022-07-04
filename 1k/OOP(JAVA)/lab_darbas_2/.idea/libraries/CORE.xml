@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="CORE">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorJA_ExtraSettings_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorJA_Recommended_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorNA_ExtraSettings_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorEU_ExtraSettings_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorNA_Recommended_1_0-mul.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/CORE/AdobeColorEU_Recommended_1_0-mul.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

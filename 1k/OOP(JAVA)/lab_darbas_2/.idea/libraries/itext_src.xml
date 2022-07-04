@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="itext-src">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/libraries/pdf/itext-src.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

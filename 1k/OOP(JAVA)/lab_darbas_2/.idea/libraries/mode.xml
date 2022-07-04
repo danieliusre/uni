@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="mode">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.text.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.equinox.preferences.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/antlr-src.zip!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/jdimodel.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.osgi.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/antlr.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.equinox.common.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/jsoup-1.7.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.core.runtime.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.netbeans.swing.outline.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/com.ibm.icu.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.core.resources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.jdt.core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.core.contenttype.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/jdi.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/org.eclipse.core.jobs.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/JavaMode.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/classpath-explorer-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/mode/jdtCompilerAdapter.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

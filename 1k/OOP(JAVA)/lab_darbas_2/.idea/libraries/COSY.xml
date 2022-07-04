@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="COSY">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/ExchangePlugin.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/CoreSyncUninstaller.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/DesignLibraryPlugin.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/SynKit.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/CoreSyncInstaller.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/CoreSyncExtensionInstaller.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/LiveType.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/COSY/CoreSyncExtensionUninstaller.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="LIBS">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/LIBS/CC-Library-mul-x86.zip!/" />
+      <root url="jar://$PROJECT_DIR$/PS/Adobe Photoshop 2020/products/LIBS/CC-Library-mul-x64.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="library2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/libraries/serial/library/serial.jar!/" />
+      <root url="jar://$PROJECT_DIR$/UNI/JAVA/Processiing/processing-3.5.4/modes/java/libraries/serial/library/jssc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
