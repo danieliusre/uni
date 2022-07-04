@@ -1,0 +1,2408 @@
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 1
+disasm2.ASM
+
+
+
+      1				     ;Apdoroti MOV, NOT, RCR, XLAT
+      2	0000			     .model small
+      3	0000			     .stack 100h
+      4	0000			     .data
+      5	0000  0D 0A 24			     endl db 0Dh, 0Ah, 24h
+      6
+      7	0003  0100*(??)			     filename db 256 dup(?)
+      8	0103  72 65 7A 2E 74 78	74+	     dst db "rez.txt", 0h
+      9	      00
+     10
+     11	010B  0000			     in_fh dw 0000h
+     12	010D  0000			     out_fh dw 0000h
+     13
+     14	010F  6D 6F 76 20		     movkomanda	db "mov	"
+     15	0113  6E 6F 74 20		     notkomanda	db "not	"
+     16	0117  78 6C 61 74 20		     xlatkomanda db "xlat "
+     17	011C  72 63 72 20		     rcrkomanda	db "rcr	"
+     18
+     19	0120  20			     space db "	"
+     20	0121  2C 20			     tarpas db ", "
+     21	0123  31 20			     rcr1 db "1	"
+     22	0125  3A 20 20 20		     msg db ":	 "
+     23	0129  2B			     pliusas db	"+"
+     24	012A  4B 6F 6D 61 6E 64	61+	     neatpazinta db "Komanda neatpazinta$"
+     25	      20 6E 65 61 74 70	61+
+     26	      7A 69 6E 74 61 24
+     27
+     28	013E  45 53 3A 5B		     esprefiksas db "ES:["
+     29	0142  43 53 3A 5B		     csprefiksas db "CS:["
+     30	0146  44 53 3A 5B		     dsprefiksas db "DS:["
+     31	014A  53 53 3A 5B		     ssprefiksas db "SS:["
+     32
+     33	014E  5D			     lls db "]"
+     34
+     35	014F  00			     espref db 0
+     36	0150  00			     cspref db 0
+     37	0151  00			     dspref db 0
+     38	0152  00			     sspref db 0
+     39
+     40	0153  0100*(??)			     output db 256 dup(?)
+     41
+     42	0253  0100*(??)			     buff db 256 dup(?)
+     43
+     44	0353  01*(??)			     komanda db	1 dup(?)
+     45
+     46	0354  01*(??)			     d db 1 dup(?)
+     47	0355  01*(??)			     w db 1 dup(?)
+     48	0356  01*(??)			     modd db 1 dup(?)
+     49	0357  01*(??)			     reg db 1 dup(?)
+     50	0358  01*(??)			     rm	db 1 dup(?)
+     51	0359  00			     poslinkis1	db 0
+     52	035A  0000			     poslinkis2	dw 0
+     53
+     54	035C  01*(????)			     operandas1	dw 1 dup(?)
+     55	035E  01*(????)			     operandas2	dw 1 dup(?)
+     56	0360  53 49			     siop db "SI"
+     57	0362  44 49			     diop db "DI"
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 2
+disasm2.ASM
+
+
+
+     58
+     59	0364  30 31 32 33 34 35	36+	     hex db "0123456789ABCDEF"
+     60	      37 38 39 41 42 43	44+
+     61	      45 46
+     62	0374  00 00 00			     hexnum db 0, 0, 0
+     63
+     64	0377			     .code
+     65	0000			     start:
+     66	0000  BA 0000s			     mov dx, @data
+     67	0003  8E DA			     mov ds, dx
+     68				     ;------------------------------------------------------------FAILO	VARDO			    +
+     69				     GAVIMAS----------------------------------
+     70	0005  33 C9			     xor cx, cx
+     71	0007  26: 8A 0E	0080		     mov cl, es:[80h]	     ; eilutes ilgis
+     72	000C  BE 0082			     mov si, 82h	     ; 1 eilutes simbolis
+     73	000F  26: 8A 24			     mov ah, es:[si]
+     74					     ;cmp ah, "/"
+     75					     ;jne pradzia
+     76					     ;jmp pagalba
+     77
+     78	0012			     pradzia:
+     79	0012  32 E4			     xor ah, ah
+     80	0014  BB 0003r			     mov bx, offset filename
+     81
+     82	0017			     loop2:
+     83	0017  26: 8A 04			     mov al, es:[si]
+     84	001A  3C 0D			     cmp al, 13	; EOL
+     85	001C  74 07			     je	yra
+     86	001E  88 07			     mov [bx], al
+     87	0020  FE C4			     inc ah
+     88	0022  EB 23 90			     jmp eloop2
+     89
+     90	0025			     yra:
+     91	0025  51			     push cx
+     92
+     93	0026  8A CC			     mov cl, ah
+     94	0028  B4 40			     mov ah, 40h
+     95	002A  BB 0001			     mov bx, 1
+     96	002D  BA 0003r			     mov dx, offset filename
+     97	0030  CD 21			     int 21h
+     98
+     99	0032  B1 02			     mov cl, 02h
+    100	0034  B4 40			     mov ah, 40h
+    101	0036  BB 0001			     mov bx, 1
+    102	0039  BA 0000r			     mov dx, offset endl
+    103	003C  CD 21			     int 21h
+    104
+    105	003E  BB 0002r			     mov bx, offset [filename -	1]
+    106	0041  59			     pop cx
+    107	0042  32 E4			     xor ah, ah
+    108
+    109	0044  EB 05 90			     jmp open
+    110
+    111	0047			     eloop2:
+    112	0047  43			     inc bx
+    113	0048  46			     inc si
+    114	0049  E2 CC			     loop loop2
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 3
+disasm2.ASM
+
+
+
+    115				     ;----------------------------------------------------------------------FAILO		    +
+    116				     ATIDARYMAS----------------------------------------
+    117	004B			     open:
+    118	004B  B8 3D00			     mov ax, 3d00h
+    119	004E  BA 0003r			     lea dx, filename
+    120	0051  CD 21			     int 21h
+    121	0053  A3 010Br			     mov in_fh,	ax
+    122
+    123					     ;jc klaida
+    124
+    125	0056  B8 3C00			 mov ax, 3c00h
+    126	0059  33 C9			 xor cx,cx
+    127	005B  BA 0103r			 lea dx, dst
+    128	005E  CD 21			 int 21h
+    129	0060  A3 010Dr			 mov out_fh,ax
+    130				     ;---------------------------------------------------------------------SKAITYMAS IS		    +
+    131				     FAILO---------------------------------------
+    132	0063			     read:
+    133	0063  B8 3F00			     mov ax, 3f00h
+    134	0066  8B 1E 010Br		     mov bx, in_fh
+    135	006A  B9 0100			     mov cx, 100h
+    136	006D  BA 0253r			     mov dx, offset buff
+    137	0070  CD 21			     int 21h
+    138
+    139	0072  8B C8			     mov cx, ax
+    140	0074  BB 0253r			     mov bx, offset buff
+    141	0077  3D 0000			     cmp ax, 0
+    142	007A  75 03			     jne loop1
+    143	007C  E9 00B7			     jmp pabaiga
+    144
+    145	007F			     loop1:
+    146	007F  51			     push cx
+    147
+    148	0080  33 C0			     xor ax, ax
+    149	0082  8A 27			     mov ah, [bx]
+    150
+    151	0084  E8 0C58			     call printhex
+    152
+    153	0087  E8 0C8C			     call prefcompare
+    154
+    155	008A  EB 07 90			     jmp compare
+    156
+    157	008D			     nemano:
+    158
+    159	008D  59			     pop cx
+    160	008E  43			     inc bx
+    161	008F  E2 EE			     loop loop1
+    162
+    163	0091  EB D0			     jmp read
+    164
+    165	0093			     compare:
+    166
+    167	0093			     p0:
+    168	0093  80 FC 88			     cmp ah, 88h
+    169	0096  75 03			     jne p1
+    170	0098  E9 00B3			     jmp mov8
+    171	009B			     p1:
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 4
+disasm2.ASM
+
+
+
+    172	009B  80 FC 89			     cmp ah, 89h
+    173	009E  75 03			     jne p2
+    174	00A0  E9 00BF			     jmp mov9
+    175	00A3			     p2:
+    176	00A3  80 FC 8A			     cmp ah, 8Ah
+    177	00A6  75 03			     jne p3
+    178	00A8  E9 00CD			     jmp movA
+    179	00AB			     p3:
+    180	00AB  80 FC 8B			     cmp ah, 8Bh
+    181	00AE  75 03			     jne p4
+    182	00B0  E9 00DB			     jmp movB
+    183	00B3			     p4:
+    184	00B3  80 FC F6			     cmp ah, 11110110b
+    185	00B6  75 03			     jne p5
+    186	00B8  E9 01E4			     jmp not0
+    187	00BB			     p5:
+    188	00BB  80 FC F7			     cmp ah, 11110111b
+    189	00BE  75 03			     jne p6
+    190	00C0  E9 01EC			     jmp not1
+    191	00C3			     p6:
+    192	00C3  80 FC D7			     cmp ah, 11010111b
+    193	00C6  75 03			     jne p7
+    194	00C8  E9 01F4			     jmp xlat1
+    195	00CB			     p7:
+    196	00CB  80 FC D0			     cmp ah, 11010000b
+    197	00CE  75 03			     jne p8
+    198	00D0  E9 0204			     jmp rcr00
+    199	00D3			     p8:
+    200	00D3  80 FC D2			     cmp ah, 11010010b
+    201	00D6  75 03			     jne p9
+    202	00D8  E9 021C			     jmp rcr10
+    203	00DB			     p9:
+    204	00DB  80 FC D1			     cmp ah, 11010001b
+    205	00DE  75 03			     jne p10
+    206	00E0  E9 0204			     jmp rcr01
+    207	00E3			     p10:
+    208	00E3  80 FC D3			     cmp ah, 11010011b
+    209	00E6  75 03			     jne p11
+    210	00E8  E9 0222			     jmp rcr11
+    211	00EB			     p11:
+    212	00EB  80 FC C6			     cmp ah, 11000110b
+    213	00EE  75 03			     jne p12
+    214	00F0  E9 00AF			     jmp mov20
+    215	00F3			     p12:
+    216	00F3  80 FC C7			     cmp ah, 11000111b
+    217	00F6  75 03			     jne p13
+    218	00F8  E9 00C0			     jmp mov21
+    219	00FB			     p13:
+    220	00FB  80 FC 0B			     cmp ah, 1011b
+    221	00FE  75 03			     jne p14
+    222	0100  E9 00D1			     jmp mov3
+    223	0103			     p14:
+    224	0103  80 FC A0			     cmp ah, 10100000b
+    225	0106  75 03			     jne p15
+    226	0108  E9 00E6			     jmp mov40
+    227	010B			     p15:
+    228	010B  80 FC A1			     cmp ah, 10100001b
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 5
+disasm2.ASM
+
+
+
+    229	010E  75 03			     jne p16
+    230	0110  E9 00FB			     jmp mov41
+    231	0113			     p16:
+    232	0113  80 FC A2			     cmp ah, 10100010b
+    233	0116  75 03			     jne p17
+    234	0118  E9 0110			     jmp mov50
+    235	011B			     p17:
+    236	011B  80 FC A3			     cmp ah, 10100011b
+    237	011E  75 03			     jne p18
+    238	0120  E9 0125			     jmp mov51
+    239	0123			     p18:
+    240	0123  80 FC 8C			     cmp ah, 10001100b
+    241	0126  75 03			     jne p19
+    242	0128  E9 013A			     jmp mov60
+    243	012B			     p19:
+    244	012B  80 FC 8E			     cmp ah, 10001110b
+    245	012E  75 03			     jne p20
+    246	0130  E9 014F			     jmp mov61
+    247	0133			     p20:
+    248				     ;	     mov cx, 20h
+    249				     ;	     mov dx, offset neatpazinta
+    250				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    251				     ;	     mov bx, out_fh
+    252				     ;	     int 21h
+    253				     ;
+    254				     ;	     mov cx, 2h
+    255				     ;	     mov dx, offset endl
+    256				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    257				     ;	     mov bx, out_fh
+    258				     ;	     int 21h
+    259
+    260
+    261	0133  E9 FF57			     jmp nemano
+    262
+    263	0136			     pabaiga:
+    264
+    265	0136  B8 3E00			     mov ax, 3e00h	     ;close file
+    266	0139  8B 1E 010Br		 mov bx, in_fh
+    267	013D  CD 21			 int 21h
+    268
+    269	013F  B8 3E00			     mov ax, 3e00h	     ;close file
+    270	0142  8B 1E 010Dr		 mov bx, out_fh
+    271	0146  CD 21			 int 21h
+    272
+    273	0148  B4 4C			 mov ah, 4ch		     ;exit
+    274	014A  B0 00			 mov al, 0
+    275	014C  CD 21			 int 21h
+    276
+    277	014E			     mov8:
+    278	014E  53			     push bx
+    279
+    280				     ;	     mov cx, 4h
+    281				     ;	     mov dx, offset movkomanda
+    282				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    283				     ;	     mov bx, out_fh
+    284				     ;	     int 21h
+    285
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 6
+disasm2.ASM
+
+
+
+    286	014F  C6 06 0353r 01		     mov komanda, 1
+    287
+    288	0154  5B			     pop bx
+    289
+    290	0155  B1 00			     mov cl, 0
+    291	0157  88 0E 0354r		     mov d, cl
+    292	015B  88 0E 0355r		     mov w, cl
+    293
+    294	015F  E9 01C1			     jmp movadresavimobaitas
+    295	0162			     mov9:
+    296	0162  53			     push bx
+    297
+    298				     ;	     mov cx, 4h
+    299				     ;	     mov dx, offset movkomanda
+    300				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    301				     ;	     mov bx, out_fh
+    302				     ;	     int 21h
+    303
+    304	0163  C6 06 0353r 01		     mov komanda, 1
+    305
+    306	0168  5B			     pop bx
+    307
+    308	0169  B1 00			     mov cl, 0
+    309	016B  88 0E 0354r		     mov d, cl
+    310	016F  B1 01			     mov cl, 1
+    311	0171  88 0E 0355r		     mov w, cl
+    312
+    313	0175  E9 01AB			     jmp movadresavimobaitas
+    314	0178			     movA:
+    315	0178  53			     push bx
+    316
+    317				     ;	     mov cx, 4h
+    318				     ;	     mov dx, offset movkomanda
+    319				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    320				     ;	     mov bx, out_fh
+    321				     ;	     int 21h
+    322
+    323	0179  C6 06 0353r 01		     mov komanda, 1
+    324
+    325	017E  5B			     pop bx
+    326
+    327	017F  B1 01			     mov cl, 1
+    328	0181  88 0E 0354r		     mov d, cl
+    329	0185  B1 00			     mov cl, 0
+    330	0187  88 0E 0355r		     mov w, cl
+    331
+    332	018B  E9 0195			     jmp movadresavimobaitas
+    333	018E			     movB:
+    334	018E  53			     push bx
+    335
+    336				     ;	     mov cx, 4h
+    337				     ;	     mov dx, offset movkomanda
+    338				     ;	     mov ah, 40h		    ;RASYMAS I FAILA
+    339				     ;	     mov bx, out_fh
+    340				     ;	     int 21h
+    341
+    342	018F  C6 06 0353r 01		     mov komanda, 1
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 7
+disasm2.ASM
+
+
+
+    343
+    344	0194  5B			     pop bx
+    345
+    346	0195  B1 01			     mov cl, 1
+    347	0197  88 0E 0354r		     mov d, cl
+    348	019B  88 0E 0355r		     mov w, cl
+    349
+    350	019F  E9 0181			     jmp movadresavimobaitas
+    351
+    352	01A2			     mov20:
+    353	01A2  53			     push bx
+    354
+    355	01A3  B9 0004			     mov cx, 4h
+    356	01A6  BA 010Fr			     mov dx, offset movkomanda
+    357	01A9  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    358	01AB  8B 1E 010Dr		     mov bx, out_fh
+    359	01AF  CD 21			     int 21h
+    360
+    361	01B1  5B			     pop bx
+    362
+    363	01B2  B1 00			     mov cl, 0
+    364	01B4  88 0E 0355r		     mov w, cl
+    365
+    366	01B8  E9 0168			     jmp movadresavimobaitas
+    367	01BB			     mov21:
+    368	01BB  53			     push bx
+    369
+    370	01BC  B9 0004			     mov cx, 4h
+    371	01BF  BA 010Fr			     mov dx, offset movkomanda
+    372	01C2  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    373	01C4  8B 1E 010Dr		     mov bx, out_fh
+    374	01C8  CD 21			     int 21h
+    375
+    376	01CA  5B			     pop bx
+    377
+    378	01CB  B1 01			     mov cl, 1
+    379	01CD  88 0E 0355r		     mov w, cl
+    380
+    381	01D1  E9 014F			     jmp movadresavimobaitas
+    382	01D4			     mov3:
+    383	01D4  53			     push bx
+    384
+    385	01D5  B9 0004			     mov cx, 4h
+    386	01D8  BA 010Fr			     mov dx, offset movkomanda
+    387	01DB  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    388	01DD  8B 1E 010Dr		     mov bx, out_fh
+    389	01E1  CD 21			     int 21h
+    390
+    391	01E3  5B			     pop bx
+    392
+    393	01E4  B1 01			     mov cl, 1
+    394	01E6  88 0E 0354r		     mov d, cl
+    395	01EA  88 0E 0355r		     mov w, cl
+    396
+    397	01EE  E9 0132			     jmp movadresavimobaitas
+    398	01F1			     mov40:
+    399	01F1  53			     push bx
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 8
+disasm2.ASM
+
+
+
+    400
+    401	01F2  B9 0004			     mov cx, 4h
+    402	01F5  BA 010Fr			     mov dx, offset movkomanda
+    403	01F8  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    404	01FA  8B 1E 010Dr		     mov bx, out_fh
+    405	01FE  CD 21			     int 21h
+    406
+    407	0200  5B			     pop bx
+    408
+    409	0201  B1 01			     mov cl, 1
+    410	0203  88 0E 0354r		     mov d, cl
+    411	0207  88 0E 0355r		     mov w, cl
+    412
+    413	020B  E9 0115			     jmp movadresavimobaitas
+    414	020E			     mov41:
+    415	020E  53			     push bx
+    416
+    417	020F  B9 0004			     mov cx, 4h
+    418	0212  BA 010Fr			     mov dx, offset movkomanda
+    419	0215  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    420	0217  8B 1E 010Dr		     mov bx, out_fh
+    421	021B  CD 21			     int 21h
+    422
+    423	021D  5B			     pop bx
+    424
+    425	021E  B1 01			     mov cl, 1
+    426	0220  88 0E 0354r		     mov d, cl
+    427	0224  88 0E 0355r		     mov w, cl
+    428
+    429	0228  E9 00F8			     jmp movadresavimobaitas
+    430	022B			     mov50:
+    431	022B  53			     push bx
+    432
+    433	022C  B9 0004			     mov cx, 4h
+    434	022F  BA 010Fr			     mov dx, offset movkomanda
+    435	0232  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    436	0234  8B 1E 010Dr		     mov bx, out_fh
+    437	0238  CD 21			     int 21h
+    438
+    439	023A  5B			     pop bx
+    440
+    441	023B  B1 01			     mov cl, 1
+    442	023D  88 0E 0354r		     mov d, cl
+    443	0241  88 0E 0355r		     mov w, cl
+    444
+    445	0245  E9 00DB			     jmp movadresavimobaitas
+    446	0248			     mov51:
+    447	0248  53			     push bx
+    448
+    449	0249  B9 0004			     mov cx, 4h
+    450	024C  BA 010Fr			     mov dx, offset movkomanda
+    451	024F  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    452	0251  8B 1E 010Dr		     mov bx, out_fh
+    453	0255  CD 21			     int 21h
+    454
+    455	0257  5B			     pop bx
+    456
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 9
+disasm2.ASM
+
+
+
+    457	0258  B1 01			     mov cl, 1
+    458	025A  88 0E 0354r		     mov d, cl
+    459	025E  88 0E 0355r		     mov w, cl
+    460
+    461	0262  E9 00BE			     jmp movadresavimobaitas
+    462	0265			     mov60:
+    463	0265  53			     push bx
+    464
+    465	0266  B9 0004			     mov cx, 4h
+    466	0269  BA 010Fr			     mov dx, offset movkomanda
+    467	026C  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    468	026E  8B 1E 010Dr		     mov bx, out_fh
+    469	0272  CD 21			     int 21h
+    470
+    471	0274  5B			     pop bx
+    472
+    473	0275  B1 01			     mov cl, 1
+    474	0277  88 0E 0354r		     mov d, cl
+    475	027B  88 0E 0355r		     mov w, cl
+    476
+    477	027F  E9 00A1			     jmp movadresavimobaitas
+    478	0282			     mov61:
+    479	0282  53			     push bx
+    480
+    481	0283  B9 0004			     mov cx, 4h
+    482	0286  BA 010Fr			     mov dx, offset movkomanda
+    483	0289  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    484	028B  8B 1E 010Dr		     mov bx, out_fh
+    485	028F  CD 21			     int 21h
+    486
+    487	0291  5B			     pop bx
+    488
+    489	0292  B1 01			     mov cl, 1
+    490	0294  88 0E 0354r		     mov d, cl
+    491	0298  88 0E 0355r		     mov w, cl
+    492
+    493	029C  E9 0084			     jmp movadresavimobaitas
+    494
+    495	029F			     not0:
+    496	029F  53			     push bx
+    497
+    498	02A0  C6 06 0353r 02		     mov komanda, 2
+    499
+    500	02A5  5B			     pop bx
+    501
+    502	02A6  B1 00			     mov cl, 0
+    503	02A8  88 0E 0355r		     mov w, cl
+    504	02AC  E9 009D			     jmp notadresavimobaitas
+    505	02AF			     not1:
+    506	02AF  53			     push bx
+    507
+    508	02B0  C6 06 0353r 02		     mov komanda, 2
+    509
+    510	02B5  5B			     pop bx
+    511
+    512	02B6  B1 01			     mov cl, 1
+    513	02B8  88 0E 0355r		     mov w, cl
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 10
+disasm2.ASM
+
+
+
+    514	02BC  E9 008D			     jmp notadresavimobaitas
+    515	02BF			     xlat1:
+    516	02BF  53			     push bx
+    517
+    518	02C0  C6 06 0353r 03		     mov komanda, 3
+    519
+    520	02C5  B9 0002			     mov cx, 2h
+    521	02C8  BA 0000r			     mov dx, offset endl
+    522	02CB  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+    523	02CD  8B 1E 010Dr		     mov bx, out_fh
+    524	02D1  CD 21			     int 21h
+    525
+    526	02D3  5B			     pop bx
+    527
+    528	02D4  E9 FDB6			     jmp nemano
+    529	02D7			     rcr00:
+    530	02D7  53			     push bx
+    531
+    532	02D8  C6 06 0353r 04		     mov komanda, 4
+    533
+    534	02DD  5B			     pop bx
+    535
+    536	02DE  B1 00			     mov cl, 0
+    537	02E0  88 0E 0355r		     mov w, cl
+    538
+    539	02E4  E9 008D			     jmp rcradresavimobaitas
+    540	02E7			     rcr01:
+    541	02E7  53			     push bx
+    542
+    543	02E8  C6 06 0353r 04		     mov komanda, 4
+    544
+    545	02ED  5B			     pop bx
+    546
+    547	02EE  B1 01			     mov cl, 1
+    548	02F0  88 0E 0355r		     mov w, cl
+    549
+    550	02F4  EB 7E 90			     jmp rcradresavimobaitas
+    551
+    552	02F7			     rcr10:
+    553	02F7  53			     push bx
+    554
+    555	02F8  C6 06 0353r 05		     mov komanda, 5
+    556
+    557	02FD  5B			     pop bx
+    558
+    559	02FE  B1 00			     mov cl, 0
+    560	0300  88 0E 0355r		     mov w, cl
+    561
+    562	0304  C7 06 035Er 4C43		     mov operandas2, "LC"
+    563	030A  EB 68 90			     jmp rcradresavimobaitas
+    564	030D			     rcr11:
+    565	030D  53			     push bx
+    566
+    567	030E  C6 06 0353r 05		     mov komanda, 5
+    568
+    569	0313  5B			     pop bx
+    570
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 11
+disasm2.ASM
+
+
+
+    571	0314  B1 01			     mov cl, 1
+    572	0316  88 0E 0355r		     mov w, cl
+    573	031A  C7 06 035Er 4C43		     mov operandas2, "LC"
+    574	0320  EB 52 90			     jmp rcradresavimobaitas
+    575
+    576	0323			     movadresavimobaitas:
+    577	0323  43			     inc bx
+    578
+    579	0324  8A 27			     mov ah, [bx]
+    580	0326  E8 09B6			     call printhex
+    581	0329  80 E4 C0			     and ah, 11000000b
+    582	032C  88 26 0356r		     mov modd, ah
+    583
+    584	0330  8A 27			     mov ah, [bx]
+    585	0332  80 E4 38			     and ah, 00111000b
+    586	0335  88 26 0357r		     mov reg, ah
+    587
+    588	0339  8A 27			     mov ah, [bx]
+    589	033B  80 E4 07			     and ah, 00000111b
+    590	033E  88 26 0358r		     mov rm, ah
+    591
+    592	0342  80 3E 0355r 00		     cmp w, 0
+    593	0347  74 4E			     je	w0
+    594	0349  E9 009B			     jmp w1
+    595
+    596	034C			     notadresavimobaitas:
+    597	034C  43			     inc bx
+    598
+    599	034D  8A 27			     mov ah, [bx]
+    600	034F  E8 098D			     call printhex
+    601	0352  80 E4 C0			     and ah, 11000000b
+    602	0355  88 26 0356r		     mov modd, ah
+    603
+    604	0359  C6 06 0357r 10		     mov reg, 00010000b
+    605
+    606	035E  8A 27			     mov ah, [bx]
+    607	0360  80 E4 07			     and ah, 00000111b
+    608	0363  88 26 0358r		     mov rm, ah
+    609
+    610	0367  C6 06 0354r 00		     mov d, 0
+    611	036C  C6 06 0353r 02		     mov komanda, 2
+    612	0371  E9 023B			     jmp operandai2
+    613
+    614	0374			     rcradresavimobaitas:
+    615	0374  43			     inc bx
+    616
+    617	0375  8A 27			     mov ah, [bx]
+    618	0377  E8 0965			     call printhex
+    619	037A  80 E4 C0			     and ah, 11000000b
+    620	037D  88 26 0356r		     mov modd, ah
+    621
+    622	0381  C6 06 0357r 18		     mov reg, 00011000b
+    623
+    624	0386  8A 27			     mov ah, [bx]
+    625	0388  80 E4 07			     and ah, 00000111b
+    626	038B  88 26 0358r		     mov rm, ah
+    627
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 12
+disasm2.ASM
+
+
+
+    628	038F  C6 06 0354r 00		     mov d, 0
+    629	0394  E9 0218			     jmp operandai2
+    630
+    631	0397			     w0:  ;------------------------------------- w=0, tikrina reg ---------------------------
+    632	0397  80 3E 0357r 00		     cmp reg, 00000000b
+    633	039C  75 03			     jne persoka1
+    634	039E  E9 0096			     jmp reg000w0
+    635	03A1			     persoka1:
+    636	03A1  80 3E 0357r 08		     cmp reg, 00001000b
+    637	03A6  75 03			     jne persoka2
+    638	03A8  E9 00A2			     jmp reg001w0
+    639	03AB			     persoka2:
+    640	03AB  80 3E 0357r 10		     cmp reg, 00010000b
+    641	03B0  75 03			     jne persoka3
+    642	03B2  E9 00AE			     jmp reg010w0
+    643	03B5			     persoka3:
+    644	03B5  80 3E 0357r 18		     cmp reg, 00011000b
+    645	03BA  75 03			     jne persoka4
+    646	03BC  E9 00BA			     jmp reg011w0
+    647	03BF			     persoka4:
+    648	03BF  80 3E 0357r 20		     cmp reg, 00100000b
+    649	03C4  75 03			     jne persoka5
+    650	03C6  E9 00C6			     jmp reg100w0
+    651	03C9			     persoka5:
+    652	03C9  80 3E 0357r 28		     cmp reg, 00101000b
+    653	03CE  75 03			     jne persoka6
+    654	03D0  E9 00D2			     jmp reg101w0
+    655	03D3			     persoka6:
+    656	03D3  80 3E 0357r 30		     cmp reg, 00110000b
+    657	03D8  75 03			     jne persoka7
+    658	03DA  E9 00DE			     jmp reg110w0
+    659	03DD			     persoka7:
+    660	03DD  80 3E 0357r 38		     cmp reg, 00111000b
+    661	03E2  75 03			     jne persoka8
+    662	03E4  E9 00EA			     jmp reg111w0
+    663	03E7			     persoka8:
+    664
+    665	03E7			     w1: ;-------------------------------------	w=1, tikrina reg ---------------------------
+    666	03E7  80 3E 0357r 00		     cmp reg, 00000000b
+    667	03EC  75 03			     jne persoka11
+    668	03EE  E9 00F6			     jmp reg000w1
+    669	03F1			     persoka11:
+    670	03F1  80 3E 0357r 08		     cmp reg, 00001000b
+    671	03F6  75 03			     jne persoka12
+    672	03F8  E9 0105			     jmp reg001w1
+    673	03FB			     persoka12:
+    674	03FB  80 3E 0357r 10		     cmp reg, 00010000b
+    675	0400  75 03			     jne persoka13
+    676	0402  E9 0114			     jmp reg010w1
+    677	0405			     persoka13:
+    678	0405  80 3E 0357r 18		     cmp reg, 00011000b
+    679	040A  75 03			     jne persoka14
+    680	040C  E9 0123			     jmp reg011w1
+    681	040F			     persoka14:
+    682	040F  80 3E 0357r 20		     cmp reg, 00100000b
+    683	0414  75 03			     jne persoka15
+    684	0416  E9 0132			     jmp reg100w1
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 13
+disasm2.ASM
+
+
+
+    685	0419			     persoka15:
+    686	0419  80 3E 0357r 28		     cmp reg, 00101000b
+    687	041E  75 03			     jne persoka16
+    688	0420  E9 0141			     jmp reg101w1
+    689	0423			     persoka16:
+    690	0423  80 3E 0357r 30		     cmp reg, 00110000b
+    691	0428  75 03			     jne persoka17
+    692	042A  E9 0150			     jmp reg110w1
+    693	042D			     persoka17:
+    694	042D  80 3E 0357r 38		     cmp reg, 00111000b
+    695	0432  75 03			     jne persoka18
+    696	0434  E9 015F			     jmp reg111w1
+    697	0437			     persoka18:
+    698
+    699	0437			     reg000w0: ;--------------------------- w=0, priskiria reiksme pagal reg ---------------
+    700	0437  80 3E 0354r 01		     cmp d, 1
+    701	043C  75 06			     jne ne0000
+    702	043E  C7 06 035Cr 4C41		     mov operandas1, "LA"
+    703	0444			     ne0000:
+    704	0444  C7 06 035Er 4C41		     mov operandas2, "LA"
+    705	044A  E9 0162			     jmp operandai2
+    706
+    707	044D			     reg001w0:
+    708	044D  80 3E 0354r 01		     cmp d, 1
+    709	0452  75 06			     jne ne0010
+    710	0454  C7 06 035Cr 4C43		     mov operandas1, "LC"
+    711	045A			     ne0010:
+    712	045A  C7 06 035Er 4C43		     mov operandas2, "LC"
+    713	0460  E9 014C			     jmp operandai2
+    714
+    715	0463			     reg010w0:
+    716	0463  80 3E 0354r 01		     cmp d, 1
+    717	0468  75 06			     jne ne0100
+    718	046A  C7 06 035Cr 4C44		     mov operandas1, "LD"
+    719	0470			     ne0100:
+    720	0470  C7 06 035Er 4C44		     mov operandas2, "LD"
+    721	0476  E9 0136			     jmp operandai2
+    722
+    723	0479			     reg011w0:
+    724	0479  80 3E 0354r 01		     cmp d, 1
+    725	047E  75 06			     jne ne0110
+    726	0480  C7 06 035Cr 4C42		     mov operandas1, "LB"
+    727	0486			     ne0110:
+    728	0486  C7 06 035Er 4C42		     mov operandas2, "LB"
+    729	048C  E9 0120			     jmp operandai2
+    730
+    731	048F			     reg100w0:
+    732	048F  80 3E 0354r 01		     cmp d, 1
+    733	0494  75 06			     jne ne1000
+    734	0496  C7 06 035Cr 4841		     mov operandas1, "HA"
+    735	049C			     ne1000:
+    736	049C  C7 06 035Er 4841		     mov operandas2, "HA"
+    737	04A2  E9 010A			     jmp operandai2
+    738
+    739	04A5			     reg101w0:
+    740	04A5  80 3E 0354r 01		     cmp d, 1
+    741	04AA  75 06			     jne ne1010
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 14
+disasm2.ASM
+
+
+
+    742	04AC  C7 06 035Cr 4843		     mov operandas1, "HC"
+    743	04B2			     ne1010:
+    744	04B2  C7 06 035Er 4843		     mov operandas2, "HC"
+    745	04B8  E9 00F4			     jmp operandai2
+    746
+    747	04BB			     reg110w0:
+    748	04BB  80 3E 0354r 01		     cmp d, 1
+    749	04C0  75 06			     jne ne1100
+    750	04C2  C7 06 035Cr 4844		     mov operandas1, "HD"
+    751	04C8			     ne1100:
+    752	04C8  C7 06 035Er 4844		     mov operandas2, "HD"
+    753	04CE  E9 00DE			     jmp operandai2
+    754
+    755	04D1			     reg111w0:
+    756	04D1  80 3E 0354r 01		     cmp d, 1
+    757	04D6  75 06			     jne ne1110
+    758	04D8  C7 06 035Cr 4842		     mov operandas1, "HB"
+    759	04DE			     ne1110:
+    760	04DE  C7 06 035Er 4842		     mov operandas2, "HB"
+    761	04E4  E9 00C8			     jmp operandai2
+    762
+    763	04E7			     reg000w1: ;--------------------------- w=1, priskiria reiksme pagal reg ---------------
+    764	04E7  80 3E 0354r 01		     cmp d, 1
+    765	04EC  75 09			     jne ne0001
+    766	04EE  C7 06 035Cr 5841		     mov operandas1, "XA"
+    767	04F4  E9 00B8				     jmp operandai2
+    768	04F7			     ne0001:
+    769	04F7  C7 06 035Er 5841		     mov operandas2, "XA"
+    770	04FD  E9 00AF			     jmp operandai2
+    771
+    772	0500			     reg001w1:
+    773	0500  80 3E 0354r 01		     cmp d, 1
+    774	0505  75 09			     jne ne0011
+    775	0507  C7 06 035Cr 5843		     mov operandas1, "XC"
+    776	050D  E9 009F				     jmp operandai2
+    777	0510			     ne0011:
+    778	0510  C7 06 035Er 5843		     mov operandas2, "XC"
+    779	0516  E9 0096			     jmp operandai2
+    780
+    781	0519			     reg010w1:
+    782	0519  80 3E 0354r 01		     cmp d, 1
+    783	051E  75 09			     jne ne0101
+    784	0520  C7 06 035Cr 4458		     mov operandas1, "DX"
+    785	0526  E9 0086				     jmp operandai2
+    786	0529			     ne0101:
+    787	0529  C7 06 035Er 4458		     mov operandas2, "DX"
+    788	052F  EB 7E 90			     jmp operandai2
+    789
+    790	0532			     reg011w1:
+    791	0532  80 3E 0354r 01		     cmp d, 1
+    792	0537  75 09			     jne ne0111
+    793	0539  C7 06 035Cr 4258		     mov operandas1, "BX"
+    794	053F  EB 6E 90				     jmp operandai2
+    795	0542			     ne0111:
+    796	0542  C7 06 035Er 4258		     mov operandas2, "BX"
+    797	0548  EB 65 90			     jmp operandai2
+    798
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 15
+disasm2.ASM
+
+
+
+    799	054B			     reg100w1:
+    800	054B  80 3E 0354r 01		     cmp d, 1
+    801	0550  75 09			     jne ne1001
+    802	0552  C7 06 035Cr 5053		     mov operandas1, "PS"
+    803	0558  EB 55 90				     jmp operandai2
+    804	055B			     ne1001:
+    805	055B  C7 06 035Er 5053		     mov operandas2, "PS"
+    806	0561  EB 4C 90			     jmp operandai2
+    807
+    808	0564			     reg101w1:
+    809	0564  80 3E 0354r 01		     cmp d, 1
+    810	0569  75 09			     jne ne1011
+    811	056B  C7 06 035Cr 4250		     mov operandas1, "BP"
+    812	0571  EB 3C 90				     jmp operandai2
+    813	0574			     ne1011:
+    814	0574  C7 06 035Er 4250		     mov operandas2, "BP"
+    815	057A  EB 33 90			     jmp operandai2
+    816
+    817	057D			     reg110w1:
+    818	057D  80 3E 0354r 01		     cmp d, 1
+    819	0582  75 09			     jne ne1101
+    820	0584  C7 06 035Cr 4953		     mov operandas1, "IS"
+    821	058A  EB 23 90				     jmp operandai2
+    822	058D			     ne1101:
+    823	058D  C7 06 035Er 4953		     mov operandas2, "IS"
+    824	0593  EB 1A 90			     jmp operandai2
+    825
+    826	0596			     reg111w1:
+    827	0596  80 3E 0354r 01		     cmp d, 1
+    828	059B  75 09			     jne ne1111
+    829	059D  C7 06 035Cr 4449		     mov operandas1, "DI"
+    830	05A3  EB 0A 90				     jmp operandai2
+    831	05A6			     ne1111:
+    832	05A6  C7 06 035Er 4449		     mov operandas2, "DI"
+    833	05AC  EB 01 90			     jmp operandai2
+    834
+    835
+    836	05AF			     operandai2: ;--------------------------------SURADO VIENA,	IESKO				    +
+    837				     KITO------------------------------
+    838	05AF  80 3E 0356r 00		     cmp modd, 00000000b
+    839	05B4  75 03			     jne persokamod1
+    840	05B6  EB 1F 90			     jmp mod00
+    841	05B9			     persokamod1:
+    842	05B9  80 3E 0356r 40		     cmp modd, 01000000b
+    843	05BE  75 03			     jne persokamod2
+    844	05C0  EB 65 90			     jmp mod01
+    845	05C3			     persokamod2:
+    846	05C3  80 3E 0356r 80		     cmp modd, 10000000b
+    847	05C8  75 03			     jne persokamod3
+    848	05CA  E9 00AA			     jmp mod10
+    849	05CD			     persokamod3:
+    850	05CD  80 3E 0356r C0		     cmp modd, 11000000b
+    851	05D2  75 03			     jne persokamod4
+    852	05D4  E9 00F0			     jmp mod11
+    853	05D7			     persokamod4:
+    854
+    855	05D7			     mod00:
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 16
+disasm2.ASM
+
+
+
+    856	05D7  80 3E 0358r 00		     cmp rm, 00000000b
+    857	05DC  75 03			     jne persoka21
+    858	05DE  E9 018D			     jmp rm000mod00
+    859	05E1			     persoka21:
+    860	05E1  80 3E 0358r 01		     cmp rm, 00000001b
+    861	05E6  75 03			     jne persoka22
+    862	05E8  E9 019C			     jmp rm001mod00
+    863	05EB			     persoka22:
+    864	05EB  80 3E 0358r 02		     cmp rm, 00000010b
+    865	05F0  75 03			     jne persoka23
+    866	05F2  E9 01AB			     jmp rm010mod00
+    867	05F5			     persoka23:
+    868	05F5  80 3E 0358r 03		     cmp rm, 00000011b
+    869	05FA  75 03			     jne persoka24
+    870	05FC  E9 01BA			     jmp rm011mod00
+    871	05FF			     persoka24:
+    872	05FF  80 3E 0358r 04		     cmp rm, 00000100b
+    873	0604  75 03			     jne persoka25
+    874	0606  E9 01C9			     jmp rm100mod00
+    875	0609			     persoka25:
+    876	0609  80 3E 0358r 05		     cmp rm, 00000101b
+    877	060E  75 03			     jne persoka26
+    878	0610  E9 01D8			     jmp rm101mod00
+    879	0613			     persoka26:
+    880	0613  80 3E 0358r 06		     cmp rm, 00000110b
+    881	0618  75 03			     jne persoka27
+    882	061A  E9 01E7			     jmp rm110mod00
+    883	061D			     persoka27:
+    884	061D  80 3E 0358r 07		     cmp rm, 00000111b
+    885	0622  75 03			     jne persoka28
+    886	0624  E9 01F6			     jmp rm111mod00
+    887	0627			     persoka28:
+    888				     ;---------------------------------------------------- mod = 01				    +
+    889				     -----------------------------------
+    890	0627			     mod01:
+    891	0627  80 3E 0358r 00		     cmp rm, 00000000b
+    892	062C  75 03			     jne persoka31
+    893	062E  E9 0205			     jmp rm000mod01
+    894	0631			     persoka31:
+    895	0631  80 3E 0358r 01		     cmp rm, 00000001b
+    896	0636  75 03			     jne persoka32
+    897	0638  E9 020E			     jmp rm001mod01
+    898	063B			     persoka32:
+    899	063B  80 3E 0358r 02		     cmp rm, 00000010b
+    900	0640  75 03			     jne persoka33
+    901	0642  E9 0217			     jmp rm010mod01
+    902	0645			     persoka33:
+    903	0645  80 3E 0358r 03		     cmp rm, 00000011b
+    904	064A  75 03			     jne persoka34
+    905	064C  E9 0220			     jmp rm011mod01
+    906	064F			     persoka34:
+    907	064F  80 3E 0358r 04		     cmp rm, 00000100b
+    908	0654  75 03			     jne persoka35
+    909	0656  E9 0229			     jmp rm100mod01
+    910	0659			     persoka35:
+    911	0659  80 3E 0358r 05		     cmp rm, 00000101b
+    912	065E  75 03			     jne persoka36
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 17
+disasm2.ASM
+
+
+
+    913	0660  E9 0232			     jmp rm101mod01
+    914	0663			     persoka36:
+    915	0663  80 3E 0358r 06		     cmp rm, 00000110b
+    916	0668  75 03			     jne persoka37
+    917	066A  E9 023B			     jmp rm110mod01
+    918	066D			     persoka37:
+    919	066D  80 3E 0358r 07		     cmp rm, 00000111b
+    920	0672  75 03			     jne persoka38
+    921	0674  E9 0244			     jmp rm111mod01
+    922	0677			     persoka38:
+    923				     ;-------------------------------------------------- mod = 10				    +
+    924				     ---------------------------------------
+    925	0677			     mod10:
+    926	0677  80 3E 0358r 00		     cmp rm, 00000000b
+    927	067C  75 03			     jne persoka41
+    928	067E  E9 024D			     jmp rm000mod10
+    929	0681			     persoka41:
+    930	0681  80 3E 0358r 01		     cmp rm, 00000001b
+    931	0686  75 03			     jne persoka42
+    932	0688  E9 0256			     jmp rm001mod10
+    933	068B			     persoka42:
+    934	068B  80 3E 0358r 02		     cmp rm, 00000010b
+    935	0690  75 03			     jne persoka43
+    936	0692  E9 025F			     jmp rm010mod10
+    937	0695			     persoka43:
+    938	0695  80 3E 0358r 03		     cmp rm, 00000011b
+    939	069A  75 03			     jne persoka44
+    940	069C  E9 0268			     jmp rm011mod10
+    941	069F			     persoka44:
+    942	069F  80 3E 0358r 04		     cmp rm, 00000100b
+    943	06A4  75 03			     jne persoka45
+    944	06A6  E9 0271			     jmp rm100mod10
+    945	06A9			     persoka45:
+    946	06A9  80 3E 0358r 05		     cmp rm, 00000101b
+    947	06AE  75 03			     jne persoka46
+    948	06B0  E9 027A			     jmp rm101mod10
+    949	06B3			     persoka46:
+    950	06B3  80 3E 0358r 06		     cmp rm, 00000110b
+    951	06B8  75 03			     jne persoka47
+    952	06BA  E9 0283			     jmp rm110mod10
+    953	06BD			     persoka47:
+    954	06BD  80 3E 0358r 07		     cmp rm, 00000111b
+    955	06C2  75 03			     jne persoka48
+    956	06C4  E9 028C			     jmp rm111mod10
+    957	06C7			     persoka48:
+    958				     ;--------------------------------------------- mod	= 11, w	= 0				    +
+    959				     -------------------------------------
+    960	06C7			     mod11:
+    961	06C7  80 3E 0355r 01		     cmp w, 1
+    962	06CC  74 50			     je	mod11w1
+    963
+    964	06CE  80 3E 0358r 00		     cmp rm, 00000000b
+    965	06D3  75 03			     jne persoka51
+    966	06D5  E9 028E			     jmp rm000mod11
+    967	06D8			     persoka51:
+    968	06D8  80 3E 0358r 01		     cmp rm, 00000001b
+    969	06DD  75 03			     jne persoka52
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 18
+disasm2.ASM
+
+
+
+    970	06DF  E9 029D			     jmp rm001mod11
+    971	06E2			     persoka52:
+    972	06E2  80 3E 0358r 02		     cmp rm, 00000010b
+    973	06E7  75 03			     jne persoka53
+    974	06E9  E9 02AC			     jmp rm010mod11
+    975	06EC			     persoka53:
+    976	06EC  80 3E 0358r 03		     cmp rm, 00000011b
+    977	06F1  75 03			     jne persoka54
+    978	06F3  E9 02BB			     jmp rm011mod11
+    979	06F6			     persoka54:
+    980	06F6  80 3E 0358r 04		     cmp rm, 00000100b
+    981	06FB  75 03			     jne persoka55
+    982	06FD  E9 02CA			     jmp rm100mod11
+    983	0700			     persoka55:
+    984	0700  80 3E 0358r 05		     cmp rm, 00000101b
+    985	0705  75 03			     jne persoka56
+    986	0707  E9 02D9			     jmp rm101mod11
+    987	070A			     persoka56:
+    988	070A  80 3E 0358r 06		     cmp rm, 00000110b
+    989	070F  75 03			     jne persoka57
+    990	0711  E9 02E8			     jmp rm110mod11
+    991	0714			     persoka57:
+    992	0714  80 3E 0358r 07		     cmp rm, 00000111b
+    993	0719  75 03			     jne persoka58
+    994	071B  E9 02F7			     jmp rm111mod11
+    995	071E			     persoka58:
+    996				     ;----------------------------------------------- mod = 11,	w = 1				    +
+    997				     --------------------------------
+    998	071E			     mod11w1:
+    999	071E  80 3E 0358r 00		     cmp rm, 00000000b
+   1000	0723  75 03			     jne persoka61
+   1001	0725  E9 0306			     jmp rm000mod11w1
+   1002	0728			     persoka61:
+   1003	0728  80 3E 0358r 01		     cmp rm, 00000001b
+   1004	072D  75 03			     jne persoka62
+   1005	072F  E9 0315			     jmp rm001mod11w1
+   1006	0732			     persoka62:
+   1007	0732  80 3E 0358r 02		     cmp rm, 00000010b
+   1008	0737  75 03			     jne persoka63
+   1009	0739  E9 0324			     jmp rm010mod11w1
+   1010	073C			     persoka63:
+   1011	073C  80 3E 0358r 03		     cmp rm, 00000011b
+   1012	0741  75 03			     jne persoka64
+   1013	0743  E9 0333			     jmp rm011mod11w1
+   1014	0746			     persoka64:
+   1015	0746  80 3E 0358r 04		     cmp rm, 00000100b
+   1016	074B  75 03			     jne persoka65
+   1017	074D  E9 0342			     jmp rm100mod11w1
+   1018	0750			     persoka65:
+   1019	0750  80 3E 0358r 05		     cmp rm, 00000101b
+   1020	0755  75 03			     jne persoka66
+   1021	0757  E9 0351			     jmp rm101mod11w1
+   1022	075A			     persoka66:
+   1023	075A  80 3E 0358r 06		     cmp rm, 00000110b
+   1024	075F  75 03			     jne persoka67
+   1025	0761  E9 0360			     jmp rm110mod11w1
+   1026	0764			     persoka67:
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 19
+disasm2.ASM
+
+
+
+   1027	0764  80 3E 0358r 07		     cmp rm, 00000111b
+   1028	0769  75 03			     jne persoka68
+   1029	076B  E9 036F			     jmp rm111mod11w1
+   1030	076E			     persoka68:
+   1031
+   1032				     ;--------------------------------------------------------------------------------------
+   1033
+   1034	076E			     rm000mod00: ;---------------------------------------------	MOD=00 --------------------
+   1035	076E  80 3E 0354r 00		     cmp d, 0
+   1036	0773  75 09			     jne ne000
+   1037	0775  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1038	077B  E9 0378			     jmp komandos
+   1039	077E			     ne000:
+   1040	077E  C7 06 035Er 5842		     mov operandas2, "XB"
+   1041	0784  E9 036F			     jmp komandos
+   1042
+   1043	0787			     rm001mod00:
+   1044	0787  80 3E 0354r 00		     cmp d, 0
+   1045	078C  75 09			     jne ne001
+   1046	078E  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1047	0794  E9 035F			     jmp komandos
+   1048	0797			     ne001:
+   1049	0797  C7 06 035Er 5842		     mov operandas2, "XB"
+   1050	079D  E9 0356			     jmp komandos
+   1051
+   1052	07A0			     rm010mod00:
+   1053	07A0  80 3E 0354r 00		     cmp d, 0
+   1054	07A5  75 09			     jne ne002
+   1055	07A7  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1056	07AD  E9 0346			     jmp komandos
+   1057	07B0			     ne002:
+   1058	07B0  C7 06 035Er 5042		     mov operandas2, "PB"
+   1059	07B6  E9 033D			     jmp komandos
+   1060
+   1061	07B9			     rm011mod00:
+   1062	07B9  80 3E 0354r 00		     cmp d, 0
+   1063	07BE  75 09			     jne ne003
+   1064	07C0  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1065	07C6  E9 032D			     jmp komandos
+   1066	07C9			     ne003:
+   1067	07C9  C7 06 035Er 5042		     mov operandas2, "PB"
+   1068	07CF  E9 0324			     jmp komandos
+   1069
+   1070	07D2			     rm100mod00:
+   1071	07D2  80 3E 0354r 00		     cmp d, 0
+   1072	07D7  75 09			     jne ne004
+   1073	07D9  C7 06 035Cr 4953		     mov operandas1, "IS"
+   1074	07DF  E9 0314			     jmp komandos
+   1075	07E2			     ne004:
+   1076	07E2  C7 06 035Er 4953		     mov operandas2, "IS"
+   1077	07E8  E9 030B			     jmp komandos
+   1078
+   1079	07EB			     rm101mod00:
+   1080	07EB  80 3E 0354r 00		     cmp d, 0
+   1081	07F0  75 09			     jne ne005
+   1082	07F2  C7 06 035Cr 4944		     mov operandas1, "ID"
+   1083	07F8  E9 02FB			     jmp komandos
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 20
+disasm2.ASM
+
+
+
+   1084	07FB			     ne005:
+   1085	07FB  C7 06 035Er 4944		     mov operandas2, "ID"
+   1086	0801  E9 02F2			     jmp komandos
+   1087
+   1088	0804			     rm110mod00:
+   1089	0804  80 3E 0354r 00		     cmp d, 0
+   1090	0809  75 09			     jne ne006
+   1091	080B  C7 06 035Cr 2121		     mov operandas1, "!!"
+   1092	0811  E9 02E2			     jmp komandos
+   1093	0814			     ne006:
+   1094	0814  C7 06 035Er 2121		     mov operandas2, "!!"
+   1095	081A  E9 02D9			     jmp komandos
+   1096
+   1097	081D			     rm111mod00:
+   1098	081D  80 3E 0354r 00		     cmp d, 0
+   1099	0822  75 09			     jne ne007
+   1100	0824  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1101	082A  E9 02C9			     jmp komandos
+   1102	082D			     ne007:
+   1103	082D  C7 06 035Er 5842		     mov operandas2, "XB"
+   1104	0833  E9 02C0			     jmp komandos
+   1105
+   1106	0836			     rm000mod01: ;---------------------------------------------	MOD=01 --------------------
+   1107	0836  80 3E 0354r 00		     cmp d, 0
+   1108	083B  75 06			     jne ne010
+   1109	083D  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1110
+   1111				     ;	     inc bx
+   1112				     ;	     mov ah, [bx]
+   1113				     ;	     mov poslinkis1, ah
+   1114
+   1115				     ;	     jmp suposlinkiu
+   1116	0843			     ne010:
+   1117	0843  C7 06 035Er 5842		     mov operandas2, "XB"
+   1118
+   1119				     ;	     inc bx
+   1120				     ;	     mov ah, [bx]
+   1121				     ;	     mov poslinkis1, ah
+   1122
+   1123				     ;	     jmp suposlinkiu
+   1124
+   1125	0849			     rm001mod01:
+   1126	0849  80 3E 0354r 00		     cmp d, 0
+   1127	084E  75 06			     jne ne011
+   1128	0850  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1129
+   1130				     ;	     inc bx
+   1131				     ;	     mov ah, [bx]
+   1132				     ;	     mov poslinkis1, ah
+   1133
+   1134				     ;	     jmp suposlinkiu
+   1135	0856			     ne011:
+   1136	0856  C7 06 035Er 5842		     mov operandas2, "XB"
+   1137
+   1138				     ;	     inc bx
+   1139				     ;	     mov ah, [bx]
+   1140				     ;	     mov poslinkis1, ah
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 21
+disasm2.ASM
+
+
+
+   1141
+   1142				     ;	     jmp suposlinkiu
+   1143
+   1144	085C			     rm010mod01:
+   1145	085C  80 3E 0354r 00		     cmp d, 0
+   1146	0861  75 06			     jne ne012
+   1147	0863  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1148
+   1149				     ;	     inc bx
+   1150				     ;	     mov ah, [bx]
+   1151				     ;	     mov poslinkis1, ah
+   1152
+   1153				     ;	     jmp suposlinkiu
+   1154	0869			     ne012:
+   1155	0869  C7 06 035Er 5042		     mov operandas2, "PB"
+   1156
+   1157				     ;	     inc bx
+   1158				     ;	     mov ah, [bx]
+   1159				     ;	     mov poslinkis1, ah
+   1160
+   1161				     ;	     jmp suposlinkiu
+   1162
+   1163	086F			     rm011mod01:
+   1164	086F  80 3E 0354r 00		     cmp d, 0
+   1165	0874  75 06			     jne ne013
+   1166	0876  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1167
+   1168				     ;	     inc bx
+   1169				     ;	     mov ah, [bx]
+   1170				     ;	     mov poslinkis1, ah
+   1171
+   1172				     ;	     jmp suposlinkiu
+   1173	087C			     ne013:
+   1174	087C  C7 06 035Er 5042		     mov operandas2, "PB"
+   1175
+   1176				     ;	     inc bx
+   1177				     ;	     mov ah, [bx]
+   1178				     ;	     mov poslinkis1, ah
+   1179
+   1180				     ;	     jmp suposlinkiu
+   1181
+   1182	0882			     rm100mod01:
+   1183	0882  80 3E 0354r 00		     cmp d, 0
+   1184	0887  75 06			     jne ne014
+   1185	0889  C7 06 035Cr 4953		     mov operandas1, "IS"
+   1186
+   1187				     ;	     inc bx
+   1188				     ;	     mov ah, [bx]
+   1189				     ;	     mov poslinkis1, ah
+   1190
+   1191				     ;	     jmp suposlinkiu
+   1192	088F			     ne014:
+   1193	088F  C7 06 035Er 4953		     mov operandas2, "IS"
+   1194
+   1195				     ;	     inc bx
+   1196				     ;	     mov ah, [bx]
+   1197				     ;	     mov poslinkis1, ah
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 22
+disasm2.ASM
+
+
+
+   1198
+   1199				     ;	     jmp suposlinkiu
+   1200
+   1201	0895			     rm101mod01:
+   1202	0895  80 3E 0354r 00		     cmp d, 0
+   1203	089A  75 06			     jne ne015
+   1204	089C  C7 06 035Cr 4944		     mov operandas1, "ID"
+   1205
+   1206				     ;	     inc bx
+   1207				     ;	     mov ah, [bx]
+   1208				     ;	     mov poslinkis1, ah
+   1209
+   1210				     ;	     jmp suposlinkiu
+   1211	08A2			     ne015:
+   1212	08A2  C7 06 035Er 4944		     mov operandas2, "ID"
+   1213
+   1214				     ;	     inc bx
+   1215				     ;	     mov ah, [bx]
+   1216				     ;	     mov poslinkis1, ah
+   1217
+   1218				     ;	     jmp suposlinkiu
+   1219
+   1220	08A8			     rm110mod01:
+   1221	08A8  80 3E 0354r 00		     cmp d, 0
+   1222	08AD  75 06			     jne ne016
+   1223	08AF  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1224
+   1225				     ;	     inc bx
+   1226				     ;	     mov ah, [bx]
+   1227				     ;	     mov poslinkis1, ah
+   1228
+   1229				     ;	     jmp suposlinkiu
+   1230	08B5			     ne016:
+   1231	08B5  C7 06 035Er 5042		     mov operandas2, "PB"
+   1232
+   1233				     ;	     inc bx
+   1234				     ;	     mov ah, [bx]
+   1235				     ;	     mov poslinkis1, ah
+   1236
+   1237				     ;	     jmp suposlinkiu
+   1238
+   1239	08BB			     rm111mod01:
+   1240	08BB  80 3E 0354r 00		     cmp d, 0
+   1241	08C0  75 06			     jne ne017
+   1242	08C2  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1243
+   1244				     ;	     inc bx
+   1245				     ;	     mov ah, [bx]
+   1246				     ;	     mov poslinkis1, ah
+   1247
+   1248				     ;	     jmp suposlinkiu
+   1249	08C8			     ne017:
+   1250	08C8  C7 06 035Er 5842		     mov operandas2, "XB"
+   1251
+   1252				     ;	     inc bx
+   1253				     ;	     mov ah, [bx]
+   1254				     ;	     mov poslinkis1, ah
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 23
+disasm2.ASM
+
+
+
+   1255
+   1256				     ;	     jmp suposlinkiu
+   1257
+   1258	08CE			     rm000mod10: ;---------------------------------------------	MOD=10 --------------------
+   1259	08CE  80 3E 0354r 00		     cmp d, 0
+   1260	08D3  75 06			     jne ne100
+   1261	08D5  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1262
+   1263				     ;	     inc bx
+   1264				     ;	     mov ah, [bx]
+   1265				     ;	     mov poslinkis21, ah
+   1266				     ;	     inc bx
+   1267				     ;	     mov ah, [bx]
+   1268				     ;	     mov poslinkis22, ah
+   1269
+   1270				     ;	     jmp suposlinkiu2
+   1271	08DB			     ne100:
+   1272	08DB  C7 06 035Er 5842		     mov operandas2, "XB"
+   1273
+   1274				     ;	     inc bx
+   1275				     ;	     mov ah, [bx]
+   1276				     ;	     mov poslinkis21, ah
+   1277				     ;	     inc bx
+   1278				     ;	     mov ah, [bx]
+   1279				     ;	     mov poslinkis22, ah
+   1280
+   1281				     ;	     jmp suposlinkiu2
+   1282
+   1283	08E1			     rm001mod10:
+   1284	08E1  80 3E 0354r 00		     cmp d, 0
+   1285	08E6  75 06			     jne ne101
+   1286	08E8  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1287
+   1288				     ;	     inc bx
+   1289				     ;	     mov ah, [bx]
+   1290				     ;	     mov poslinkis21, ah
+   1291				     ;	     inc bx
+   1292				     ;	     mov ah, [bx]
+   1293				     ;	     mov poslinkis22, ah
+   1294
+   1295				     ;	     jmp suposlinkiu2
+   1296	08EE			     ne101:
+   1297	08EE  C7 06 035Er 5842		     mov operandas2, "XB"
+   1298
+   1299				     ;	     inc bx
+   1300				     ;	     mov ah, [bx]
+   1301				     ;	     mov poslinkis21, ah
+   1302				     ;	     inc bx
+   1303				     ;	     mov ah, [bx]
+   1304				     ;	     mov poslinkis22, ah
+   1305
+   1306				     ;	     jmp suposlinkiu2
+   1307
+   1308	08F4			     rm010mod10:
+   1309	08F4  80 3E 0354r 00		     cmp d, 0
+   1310	08F9  75 06			     jne ne102
+   1311	08FB  C7 06 035Cr 5042		     mov operandas1, "PB"
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 24
+disasm2.ASM
+
+
+
+   1312
+   1313				     ;	     inc bx
+   1314				     ;	     mov ah, [bx]
+   1315				     ;	     mov poslinkis21, ah
+   1316				     ;	     inc bx
+   1317				     ;	     mov ah, [bx]
+   1318				     ;	     mov poslinkis22, ah
+   1319
+   1320				     ;	     jmp suposlinkiu2
+   1321	0901			     ne102:
+   1322	0901  C7 06 035Er 5042		     mov operandas2, "PB"
+   1323
+   1324				     ;	     inc bx
+   1325				     ;	     mov ah, [bx]
+   1326				     ;	     mov poslinkis21, ah
+   1327				     ;	     inc bx
+   1328				     ;	     mov ah, [bx]
+   1329				     ;	     mov poslinkis22, ah
+   1330
+   1331				     ;	     jmp suposlinkiu2
+   1332
+   1333	0907			     rm011mod10:
+   1334	0907  80 3E 0354r 00		     cmp d, 0
+   1335	090C  75 06			     jne ne103
+   1336	090E  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1337
+   1338				     ;	     inc bx
+   1339				     ;	     mov ah, [bx]
+   1340				     ;	     mov poslinkis21, ah
+   1341				     ;	     inc bx
+   1342				     ;	     mov ah, [bx]
+   1343				     ;	     mov poslinkis22, ah
+   1344
+   1345				     ;	     jmp suposlinkiu2
+   1346	0914			     ne103:
+   1347	0914  C7 06 035Er 5042		     mov operandas2, "PB"
+   1348
+   1349				     ;	     inc bx
+   1350				     ;	     mov ah, [bx]
+   1351				     ;	     mov poslinkis21, ah
+   1352				     ;	     inc bx
+   1353				     ;	     mov ah, [bx]
+   1354				     ;	     mov poslinkis22, ah
+   1355
+   1356				     ;	     jmp suposlinkiu2
+   1357
+   1358	091A			     rm100mod10:
+   1359	091A  80 3E 0354r 00		     cmp d, 0
+   1360	091F  75 06			     jne ne104
+   1361	0921  C7 06 035Cr 4953		     mov operandas1, "IS"
+   1362
+   1363				     ;	     inc bx
+   1364				     ;	     mov ah, [bx]
+   1365				     ;	     mov poslinkis21, ah
+   1366				     ;	     inc bx
+   1367				     ;	     mov ah, [bx]
+   1368				     ;	     mov poslinkis22, ah
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 25
+disasm2.ASM
+
+
+
+   1369
+   1370				     ;	     jmp suposlinkiu2
+   1371	0927			     ne104:
+   1372	0927  C7 06 035Er 4953		     mov operandas2, "IS"
+   1373
+   1374				     ;	     inc bx
+   1375				     ;	     mov ah, [bx]
+   1376				     ;	     mov poslinkis21, ah
+   1377				     ;	     inc bx
+   1378				     ;	     mov ah, [bx]
+   1379				     ;	     mov poslinkis22, ah
+   1380
+   1381				     ;	     jmp suposlinkiu2
+   1382
+   1383	092D			     rm101mod10:
+   1384	092D  80 3E 0354r 00		     cmp d, 0
+   1385	0932  75 06			     jne ne105
+   1386	0934  C7 06 035Cr 4944		     mov operandas1, "ID"
+   1387
+   1388				     ;	     inc bx
+   1389				     ;	     mov ah, [bx]
+   1390				     ;	     mov poslinkis21, ah
+   1391				     ;	     inc bx
+   1392				     ;	     mov ah, [bx]
+   1393				     ;	     mov poslinkis22, ah
+   1394
+   1395				     ;	     jmp suposlinkiu2
+   1396	093A			     ne105:
+   1397	093A  C7 06 035Er 4944		     mov operandas2, "ID"
+   1398
+   1399				     ;	     inc bx
+   1400				     ;	     mov ah, [bx]
+   1401				     ;	     mov poslinkis21, ah
+   1402				     ;	     inc bx
+   1403				     ;	     mov ah, [bx]
+   1404				     ;	     mov poslinkis22, ah
+   1405
+   1406				     ;	     jmp suposlinkiu2
+   1407
+   1408	0940			     rm110mod10:
+   1409	0940  80 3E 0354r 00		     cmp d, 0
+   1410	0945  75 06			     jne ne106
+   1411	0947  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1412
+   1413				     ;	     inc bx
+   1414				     ;	     mov ah, [bx]
+   1415				     ;	     mov poslinkis21, ah
+   1416				     ;	     inc bx
+   1417				     ;	     mov ah, [bx]
+   1418				     ;	     mov poslinkis22, ah
+   1419
+   1420				     ;	     jmp suposlinkiu2
+   1421	094D			     ne106:
+   1422	094D  C7 06 035Er 5042		     mov operandas2, "PB"
+   1423
+   1424				     ;	     inc bx
+   1425				     ;	     mov ah, [bx]
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 26
+disasm2.ASM
+
+
+
+   1426				     ;	     mov poslinkis21, ah
+   1427				     ;	     inc bx
+   1428				     ;	     mov ah, [bx]
+   1429				     ;	     mov poslinkis22, ah
+   1430
+   1431				     ;	     jmp suposlinkiu2
+   1432
+   1433	0953			     rm111mod10:
+   1434	0953  80 3E 0354r 00		     cmp d, 0
+   1435	0958  75 06			     jne ne107
+   1436	095A  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1437
+   1438				     ;	     inc bx
+   1439				     ;	     mov ah, [bx]
+   1440				     ;	     mov poslinkis21, ah
+   1441				     ;	     inc bx
+   1442				     ;	     mov ah, [bx]
+   1443				     ;	     mov poslinkis22, ah
+   1444
+   1445				     ;	     jmp suposlinkiu2
+   1446	0960			     ne107:
+   1447	0960  C7 06 035Er 5842		     mov operandas2, "XB"
+   1448
+   1449				     ;	     inc bx
+   1450				     ;	     mov ah, [bx]
+   1451				     ;	     mov poslinkis21, ah
+   1452				     ;	     inc bx
+   1453				     ;	     mov ah, [bx]
+   1454				     ;	     mov poslinkis22, ah
+   1455
+   1456				     ;	     jmp suposlinkiu2
+   1457
+   1458	0966			     rm000mod11: ;---------------------------------------------	MOD=11 w=0 --------------------
+   1459	0966  80 3E 0354r 00		     cmp d, 0
+   1460	096B  75 09			     jne ne110
+   1461	096D  C7 06 035Cr 4C41		     mov operandas1, "LA"
+   1462	0973  E9 0180			     jmp komandos
+   1463	0976			     ne110:
+   1464	0976  C7 06 035Er 4C41		     mov operandas2, "LA"
+   1465	097C  E9 0177			     jmp komandos
+   1466
+   1467	097F			     rm001mod11:
+   1468	097F  80 3E 0354r 00		     cmp d, 0
+   1469	0984  75 09			     jne ne111
+   1470	0986  C7 06 035Cr 4C43		     mov operandas1, "LC"
+   1471	098C  E9 0167			     jmp komandos
+   1472	098F			     ne111:
+   1473	098F  C7 06 035Er 4C43		     mov operandas2, "LC"
+   1474	0995  E9 015E			     jmp komandos
+   1475
+   1476	0998			     rm010mod11:
+   1477	0998  80 3E 0354r 00		     cmp d, 0
+   1478	099D  75 09			     jne ne112
+   1479	099F  C7 06 035Cr 4C44		     mov operandas1, "LD"
+   1480	09A5  E9 014E			     jmp komandos
+   1481	09A8			     ne112:
+   1482	09A8  C7 06 035Er 4C44		     mov operandas2, "LD"
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 27
+disasm2.ASM
+
+
+
+   1483	09AE  E9 0145			     jmp komandos
+   1484
+   1485	09B1			     rm011mod11:
+   1486	09B1  80 3E 0354r 00		     cmp d, 0
+   1487	09B6  75 09			     jne ne113
+   1488	09B8  C7 06 035Cr 4C42		     mov operandas1, "LB"
+   1489	09BE  E9 0135			     jmp komandos
+   1490	09C1			     ne113:
+   1491	09C1  C7 06 035Er 4C42		     mov operandas2, "LB"
+   1492	09C7  E9 012C			     jmp komandos
+   1493
+   1494	09CA			     rm100mod11:
+   1495	09CA  80 3E 0354r 00		     cmp d, 0
+   1496	09CF  75 09			     jne ne114
+   1497	09D1  C7 06 035Cr 4841		     mov operandas1, "HA"
+   1498	09D7  E9 011C			     jmp komandos
+   1499	09DA			     ne114:
+   1500	09DA  C7 06 035Er 4841		     mov operandas2, "HA"
+   1501	09E0  E9 0113			     jmp komandos
+   1502
+   1503	09E3			     rm101mod11:
+   1504	09E3  80 3E 0354r 00		     cmp d, 0
+   1505	09E8  75 09			     jne ne115
+   1506	09EA  C7 06 035Cr 4843		     mov operandas1, "HC"
+   1507	09F0  E9 0103			     jmp komandos
+   1508	09F3			     ne115:
+   1509	09F3  C7 06 035Er 4843		     mov operandas2, "HC"
+   1510	09F9  E9 00FA			     jmp komandos
+   1511
+   1512	09FC			     rm110mod11:
+   1513	09FC  80 3E 0354r 00		     cmp d, 0
+   1514	0A01  75 09			     jne ne116
+   1515	0A03  C7 06 035Cr 4844		     mov operandas1, "HD"
+   1516	0A09  E9 00EA			     jmp komandos
+   1517	0A0C			     ne116:
+   1518	0A0C  C7 06 035Er 4844		     mov operandas2, "HD"
+   1519	0A12  E9 00E1			     jmp komandos
+   1520
+   1521	0A15			     rm111mod11:
+   1522	0A15  80 3E 0354r 00		     cmp d, 0
+   1523	0A1A  75 09			     jne ne117
+   1524	0A1C  C7 06 035Cr 4842		     mov operandas1, "HB"
+   1525	0A22  E9 00D1			     jmp komandos
+   1526	0A25			     ne117:
+   1527	0A25  C7 06 035Er 4842		     mov operandas2, "HB"
+   1528	0A2B  E9 00C8			     jmp komandos
+   1529
+   1530	0A2E			     rm000mod11w1: ;--------------------------------------------- MOD=11 w=1 --------------------
+   1531	0A2E  80 3E 0354r 00		     cmp d, 0
+   1532	0A33  75 09			     jne ne110w1
+   1533	0A35  C7 06 035Cr 5841		     mov operandas1, "XA"
+   1534	0A3B  E9 00B8			     jmp komandos
+   1535	0A3E			     ne110w1:
+   1536	0A3E  C7 06 035Er 5841		     mov operandas2, "XA"
+   1537	0A44  E9 00AF			     jmp komandos
+   1538
+   1539	0A47			     rm001mod11w1:
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 28
+disasm2.ASM
+
+
+
+   1540	0A47  80 3E 0354r 00		     cmp d, 0
+   1541	0A4C  75 09			     jne ne111w1
+   1542	0A4E  C7 06 035Cr 5843		     mov operandas1, "XC"
+   1543	0A54  E9 009F			     jmp komandos
+   1544	0A57			     ne111w1:
+   1545	0A57  C7 06 035Er 5843		     mov operandas2, "XC"
+   1546	0A5D  E9 0096			     jmp komandos
+   1547
+   1548	0A60			     rm010mod11w1:
+   1549	0A60  80 3E 0354r 00		     cmp d, 0
+   1550	0A65  75 09			     jne ne112w1
+   1551	0A67  C7 06 035Cr 5844		     mov operandas1, "XD"
+   1552	0A6D  E9 0086			     jmp komandos
+   1553	0A70			     ne112w1:
+   1554	0A70  C7 06 035Er 5844		     mov operandas2, "XD"
+   1555	0A76  EB 7E 90			     jmp komandos
+   1556
+   1557	0A79			     rm011mod11w1:
+   1558	0A79  80 3E 0354r 00		     cmp d, 0
+   1559	0A7E  75 09			     jne ne113w1
+   1560	0A80  C7 06 035Cr 5842		     mov operandas1, "XB"
+   1561	0A86  EB 6E 90			     jmp komandos
+   1562	0A89			     ne113w1:
+   1563	0A89  C7 06 035Er 5842		     mov operandas2, "XB"
+   1564	0A8F  EB 65 90			     jmp komandos
+   1565
+   1566	0A92			     rm100mod11w1:
+   1567	0A92  80 3E 0354r 00		     cmp d, 0
+   1568	0A97  75 09			     jne ne114w1
+   1569	0A99  C7 06 035Cr 5350		     mov operandas1, "SP"
+   1570	0A9F  EB 55 90			     jmp komandos
+   1571	0AA2			     ne114w1:
+   1572	0AA2  C7 06 035Er 5350		     mov operandas2, "SP"
+   1573	0AA8  EB 4C 90			     jmp komandos
+   1574
+   1575	0AAB			     rm101mod11w1:
+   1576	0AAB  80 3E 0354r 00		     cmp d, 0
+   1577	0AB0  75 09			     jne ne115w1
+   1578	0AB2  C7 06 035Cr 5042		     mov operandas1, "PB"
+   1579	0AB8  EB 3C 90			     jmp komandos
+   1580	0ABB			     ne115w1:
+   1581	0ABB  C7 06 035Er 5042		     mov operandas2, "PB"
+   1582	0AC1  EB 33 90			     jmp komandos
+   1583
+   1584	0AC4			     rm110mod11w1:
+   1585	0AC4  80 3E 0354r 00		     cmp d, 0
+   1586	0AC9  75 09			     jne ne116w1
+   1587	0ACB  C7 06 035Cr 4953		     mov operandas1, "IS"
+   1588	0AD1  EB 23 90			     jmp komandos
+   1589	0AD4			     ne116w1:
+   1590	0AD4  C7 06 035Er 4953		     mov operandas2, "IS"
+   1591	0ADA  EB 1A 90			     jmp komandos
+   1592
+   1593	0ADD			     rm111mod11w1:
+   1594	0ADD  80 3E 0354r 00		     cmp d, 0
+   1595	0AE2  75 09			     jne ne117w1
+   1596	0AE4  C7 06 035Cr 4944		     mov operandas1, "ID"
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 29
+disasm2.ASM
+
+
+
+   1597	0AEA  EB 0A 90			     jmp komandos
+   1598	0AED			     ne117w1:
+   1599	0AED  C7 06 035Er 4944		     mov operandas2, "ID"
+   1600	0AF3  EB 01 90			     jmp komandos
+   1601
+   1602	0AF6			     komandos:
+   1603	0AF6  80 3E 0353r 01		     cmp komanda, 1
+   1604	0AFB  75 12			     jne nemov
+   1605	0AFD  53			     push bx
+   1606
+   1607	0AFE  B9 0004			     mov cx, 4h
+   1608	0B01  BA 010Fr			     mov dx, offset movkomanda
+   1609	0B04  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1610	0B06  8B 1E 010Dr		     mov bx, out_fh
+   1611	0B0A  CD 21			     int 21h
+   1612	0B0C  EB 5E 90			     jmp beposlinkio
+   1613	0B0F			     nemov:
+   1614	0B0F  80 3E 0353r 02		     cmp komanda, 2
+   1615	0B14  75 11			     jne nenot
+   1616
+   1617	0B16  B9 0004			     mov cx, 4h
+   1618	0B19  BA 0113r			     mov dx, offset notkomanda
+   1619	0B1C  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1620	0B1E  8B 1E 010Dr		     mov bx, out_fh
+   1621	0B22  CD 21			     int 21h
+   1622	0B24  EB 46 90			     jmp beposlinkio
+   1623	0B27			     nenot:
+   1624	0B27  80 3E 0353r 03		     cmp komanda, 3
+   1625	0B2C  75 11			     jne nexlat
+   1626
+   1627	0B2E  B9 0004			     mov cx, 4h
+   1628	0B31  BA 0117r			     mov dx, offset xlatkomanda
+   1629	0B34  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1630	0B36  8B 1E 010Dr		     mov bx, out_fh
+   1631	0B3A  CD 21			     int 21h
+   1632	0B3C  E9 0188			     jmp viskas
+   1633	0B3F			     nexlat:
+   1634	0B3F  80 3E 0353r 04		     cmp komanda, 4
+   1635	0B44  75 11			     jne nercr1
+   1636
+   1637	0B46  B9 0004			     mov cx, 4h
+   1638	0B49  BA 011Cr			     mov dx, offset rcrkomanda
+   1639	0B4C  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1640	0B4E  8B 1E 010Dr		     mov bx, out_fh
+   1641	0B52  CD 21			     int 21h
+   1642	0B54  EB 16 90			     jmp beposlinkio
+   1643	0B57			     nercr1:
+   1644	0B57  80 3E 0353r 05		     cmp komanda, 5
+   1645	0B5C  75 0E			     jne beposlinkio
+   1646
+   1647	0B5E  B9 0004			     mov cx, 4h
+   1648	0B61  BA 011Cr			     mov dx, offset rcrkomanda
+   1649	0B64  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1650	0B66  8B 1E 010Dr		     mov bx, out_fh
+   1651	0B6A  CD 21			     int 21h
+   1652
+   1653	0B6C			     beposlinkio: ;--------------------------- spausdina, poslinkio nera			    +
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 30
+disasm2.ASM
+
+
+
+   1654				     --------------------------------------------
+   1655
+   1656	0B6C  B9 0002			     mov cx, 2h
+   1657	0B6F  BA 035Cr			     mov dx, offset operandas1
+   1658	0B72  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1659	0B74  8B 1E 010Dr		     mov bx, out_fh
+   1660	0B78  CD 21			     int 21h
+   1661
+   1662	0B7A  80 3E 0353r 02		     cmp komanda, 2
+   1663	0B7F  75 03			     jne neviskas
+   1664	0B81  E9 0143			     jmp viskas
+   1665	0B84			     neviskas:
+   1666	0B84  B9 0002			     mov cx, 2h
+   1667	0B87  BA 0121r			     mov dx, offset tarpas
+   1668	0B8A  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1669	0B8C  8B 1E 010Dr		     mov bx, out_fh
+   1670	0B90  CD 21			     int 21h
+   1671
+   1672	0B92  80 3E 0353r 04		     cmp komanda, 4
+   1673	0B97  75 11			     jne nercr0
+   1674	0B99  B9 0002			     mov cx, 2h
+   1675	0B9C  BA 0123r			     mov dx, offset rcr1
+   1676	0B9F  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1677	0BA1  8B 1E 010Dr		     mov bx, out_fh
+   1678	0BA5  CD 21			     int 21h
+   1679	0BA7  E9 011D			     jmp viskas
+   1680
+   1681	0BAA			     nercr0:
+   1682	0BAA  80 3E 014Fr 01		     cmp espref, 1
+   1683	0BAF  75 0E			     jne nees
+   1684
+   1685	0BB1  B9 0004			     mov cx, 4h
+   1686	0BB4  BA 013Er			     mov dx, offset esprefiksas
+   1687	0BB7  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1688	0BB9  8B 1E 010Dr		     mov bx, out_fh
+   1689	0BBD  CD 21			     int 21h
+   1690	0BBF			     nees:
+   1691	0BBF  80 3E 0150r 01		     cmp cspref, 1
+   1692	0BC4  75 0E			     jne necs
+   1693
+   1694	0BC6  B9 0004			     mov cx, 4h
+   1695	0BC9  BA 0142r			     mov dx, offset csprefiksas
+   1696	0BCC  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1697	0BCE  8B 1E 010Dr		     mov bx, out_fh
+   1698	0BD2  CD 21			     int 21h
+   1699	0BD4			     necs:
+   1700	0BD4  80 3E 0151r 01		     cmp dspref, 1
+   1701	0BD9  75 0E			     jne neds
+   1702
+   1703	0BDB  B9 0004			     mov cx, 4h
+   1704	0BDE  BA 0146r			     mov dx, offset dsprefiksas
+   1705	0BE1  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1706	0BE3  8B 1E 010Dr		     mov bx, out_fh
+   1707	0BE7  CD 21			     int 21h
+   1708	0BE9			     neds:
+   1709	0BE9  80 3E 0152r 01		     cmp sspref, 1
+   1710	0BEE  75 0E			     jne ness
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 31
+disasm2.ASM
+
+
+
+   1711
+   1712	0BF0  B9 0004			     mov cx, 4h
+   1713	0BF3  BA 014Ar			     mov dx, offset ssprefiksas
+   1714	0BF6  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1715	0BF8  8B 1E 010Dr		     mov bx, out_fh
+   1716	0BFC  CD 21			     int 21h
+   1717	0BFE			     ness:
+   1718
+   1719	0BFE  B9 0002			     mov cx, 2h
+   1720	0C01  BA 035Er			     mov dx, offset operandas2
+   1721	0C04  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1722	0C06  8B 1E 010Dr		     mov bx, out_fh
+   1723	0C0A  CD 21			     int 21h
+   1724
+   1725	0C0C  80 3E 014Fr 00		     cmp espref, 0
+   1726	0C11  74 11			     je	neraes
+   1727	0C13  B9 0001			     mov cx, 1h
+   1728	0C16  BA 014Er			     mov dx, offset lls
+   1729	0C19  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1730	0C1B  8B 1E 010Dr		     mov bx, out_fh
+   1731	0C1F  CD 21			     int 21h
+   1732	0C21  EB 46 90			     jmp neraseg
+   1733	0C24			     neraes:
+   1734	0C24  80 3E 0150r 00		     cmp cspref, 0
+   1735	0C29  74 11			     je	neracs
+   1736	0C2B  B9 0001			     mov cx, 1h
+   1737	0C2E  BA 014Er			     mov dx, offset lls
+   1738	0C31  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1739	0C33  8B 1E 010Dr		     mov bx, out_fh
+   1740	0C37  CD 21			     int 21h
+   1741	0C39  EB 2E 90			     jmp neraseg
+   1742	0C3C			     neracs:
+   1743	0C3C  80 3E 0151r 00		     cmp dspref, 0
+   1744	0C41  74 11			     je	nerads
+   1745	0C43  B9 0001			     mov cx, 1h
+   1746	0C46  BA 014Er			     mov dx, offset lls
+   1747	0C49  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1748	0C4B  8B 1E 010Dr		     mov bx, out_fh
+   1749	0C4F  CD 21			     int 21h
+   1750	0C51  EB 16 90			     jmp neraseg
+   1751	0C54			     nerads:
+   1752	0C54  80 3E 0152r 00		     cmp sspref, 0
+   1753	0C59  74 0E			     je	neraseg
+   1754	0C5B  B9 0001			     mov cx, 1h
+   1755	0C5E  BA 014Er			     mov dx, offset lls
+   1756	0C61  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1757	0C63  8B 1E 010Dr		     mov bx, out_fh
+   1758	0C67  CD 21			     int 21h
+   1759
+   1760	0C69			     neraseg:
+   1761	0C69  80 3E 0356r C0		     cmp modd, 11000000b
+   1762	0C6E  74 57			     je	viskas
+   1763	0C70  80 3E 0358r 04		     cmp rm, 00000100b
+   1764	0C75  74 50			     je	viskas
+   1765	0C77  80 3E 0358r 05		     cmp rm, 00000101b
+   1766	0C7C  74 49			     je	viskas
+   1767	0C7E  80 3E 0358r 06		     cmp rm, 00000110b
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 32
+disasm2.ASM
+
+
+
+   1768	0C83  74 42			     je	viskas
+   1769	0C85  80 3E 0358r 07		     cmp rm, 00000111b
+   1770	0C8A  74 3B			     je	viskas
+   1771
+   1772	0C8C  B9 0001			     mov cx, 1h
+   1773	0C8F  BA 0129r			     mov dx, offset pliusas
+   1774	0C92  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1775	0C94  8B 1E 010Dr		     mov bx, out_fh
+   1776	0C98  CD 21			     int 21h
+   1777
+   1778	0C9A  80 3E 0358r 01		     cmp rm, 00000001b
+   1779	0C9F  74 18			     je	busdi
+   1780	0CA1  80 3E 0358r 03		     cmp rm, 00000011b
+   1781	0CA6  74 11			     je	busdi
+   1782
+   1783	0CA8  B9 0002			     mov cx, 2h
+   1784	0CAB  BA 0360r			     mov dx, offset siop
+   1785	0CAE  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1786	0CB0  8B 1E 010Dr		     mov bx, out_fh
+   1787	0CB4  CD 21			     int 21h
+   1788
+   1789	0CB6  EB 0F 90			     jmp viskas
+   1790
+   1791	0CB9			     busdi:
+   1792
+   1793	0CB9  B9 0002			     mov cx, 2h
+   1794	0CBC  BA 0362r			     mov dx, offset diop
+   1795	0CBF  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1796	0CC1  8B 1E 010Dr		     mov bx, out_fh
+   1797	0CC5  CD 21			     int 21h
+   1798
+   1799	0CC7			     viskas:
+   1800	0CC7  B9 0002			     mov cx, 2h
+   1801	0CCA  BA 0000r			     mov dx, offset endl
+   1802	0CCD  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1803	0CCF  8B 1E 010Dr		     mov bx, out_fh
+   1804	0CD3  CD 21			     int 21h
+   1805
+   1806	0CD5  32 C9			     xor cl, cl
+   1807	0CD7  88 0E 0353r		     mov komanda, cl
+   1808	0CDB  5B			     pop bx
+   1809
+   1810	0CDC  E9 F3AE			     jmp nemano
+   1811
+   1812	0CDF			     printhex:
+   1813
+   1814	0CDF  53			     push bx ;Save our registers
+   1815	0CE0  50			     push ax
+   1816	0CE1  8A C4			     mov al, ah
+   1817	0CE3  D0 EC D0 EC D0 EC	D0+	     shr ah, 4 ;Get the	high part
+   1818	      EC
+   1819	0CEB  24 0F			     and al, 0Fh ;Get the lox part
+   1820	0CED  BB 0364r			     lea bx, hex ;Set up the xlat table
+   1821	0CF0  D7			     xlat ;lookup
+   1822	0CF1  86 E0			     xchg ah, al ;order	or byte	properly
+   1823	0CF3  D7			     xlat ;lookup
+   1824	0CF4  A3 0374r			     mov word ptr hexnum, ax ;Put the string in	hexnum
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 33
+disasm2.ASM
+
+
+
+   1825
+   1826	0CF7  B9 0002			     mov cx, 2h
+   1827	0CFA  BA 0374r			     mov dx, offset hexnum
+   1828	0CFD  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1829	0CFF  8B 1E 010Dr		     mov bx, out_fh
+   1830	0D03  CD 21			     int 21h
+   1831
+   1832	0D05  B9 0001			     mov cx, 1h
+   1833	0D08  BA 0120r			     mov dx, offset space
+   1834	0D0B  B4 40			     mov ah, 40h		    ;RASYMAS I FAILA
+   1835	0D0D  8B 1E 010Dr		     mov bx, out_fh
+   1836	0D11  CD 21			     int 21h
+   1837
+   1838	0D13  58		     pop ax ;Restore our registers
+   1839	0D14  5B		     pop bx
+   1840	0D15  C3		     ret ;Return
+   1841
+   1842	0D16			     prefcompare:
+   1843
+   1844	0D16  B1 00			     mov cl, 0
+   1845	0D18  88 0E 014Fr		     mov espref, cl
+   1846	0D1C  88 0E 0150r		     mov cspref, cl
+   1847	0D20  88 0E 0151r		     mov dspref, cl
+   1848	0D24  88 0E 0152r		     mov sspref, cl
+   1849
+   1850	0D28  B1 01			     mov cl, 1
+   1851	0D2A  80 FC 26			     cmp ah, 00100110b
+   1852	0D2D  75 0A			     jne pref1
+   1853	0D2F  88 0E 014Fr		     mov espref, cl
+   1854	0D33  43			     inc bx
+   1855	0D34  8A 27			     mov ah, [bx]
+   1856	0D36  E8 FFA6			     call printhex
+   1857	0D39			     pref1:
+   1858	0D39  80 FC 2E			     cmp ah, 00101110b
+   1859	0D3C  75 0A			     jne pref2
+   1860	0D3E  88 0E 0150r		     mov cspref, cl
+   1861	0D42  43			     inc bx
+   1862	0D43  8A 27			     mov ah, [bx]
+   1863	0D45  E8 FF97			     call printhex
+   1864	0D48			     pref2:
+   1865	0D48  80 FC 36			     cmp ah, 00110110b
+   1866	0D4B  75 0A			     jne pref3
+   1867	0D4D  88 0E 0151r		     mov dspref, cl
+   1868	0D51  43			     inc bx
+   1869	0D52  8A 27			     mov ah, [bx]
+   1870	0D54  E8 FF88			     call printhex
+   1871	0D57			     pref3:
+   1872	0D57  80 FC 3E			     cmp ah, 00111110b
+   1873	0D5A  75 0A			     jne pref4
+   1874	0D5C  88 0E 0152r		     mov sspref, cl
+   1875	0D60  43			     inc bx
+   1876	0D61  8A 27			     mov ah, [bx]
+   1877	0D63  E8 FF79			     call printhex
+   1878	0D66			     pref4:
+   1879
+   1880	0D66  C3			     ret
+   1881
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 34
+disasm2.ASM
+
+
+
+   1882				     end start
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 35
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "01/03/21"
+??FILENAME			  Text	 "disasm2 "
+??TIME				  Text	 "20:58:05"
+??VERSION			  Number 030A
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 DISASM2
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+BEPOSLINKIO			  Near	 _TEXT:0B6C
+BUFF				  Byte	 DGROUP:0253
+BUSDI				  Near	 _TEXT:0CB9
+COMPARE				  Near	 _TEXT:0093
+CSPREF				  Byte	 DGROUP:0150
+CSPREFIKSAS			  Byte	 DGROUP:0142
+D				  Byte	 DGROUP:0354
+DIOP				  Byte	 DGROUP:0362
+DSPREF				  Byte	 DGROUP:0151
+DSPREFIKSAS			  Byte	 DGROUP:0146
+DST				  Byte	 DGROUP:0103
+ELOOP2				  Near	 _TEXT:0047
+ENDL				  Byte	 DGROUP:0000
+ESPREF				  Byte	 DGROUP:014F
+ESPREFIKSAS			  Byte	 DGROUP:013E
+FILENAME			  Byte	 DGROUP:0003
+HEX				  Byte	 DGROUP:0364
+HEXNUM				  Byte	 DGROUP:0374
+IN_FH				  Word	 DGROUP:010B
+KOMANDA				  Byte	 DGROUP:0353
+KOMANDOS			  Near	 _TEXT:0AF6
+LLS				  Byte	 DGROUP:014E
+LOOP1				  Near	 _TEXT:007F
+LOOP2				  Near	 _TEXT:0017
+MOD00				  Near	 _TEXT:05D7
+MOD01				  Near	 _TEXT:0627
+MOD10				  Near	 _TEXT:0677
+MOD11				  Near	 _TEXT:06C7
+MOD11W1				  Near	 _TEXT:071E
+MODD				  Byte	 DGROUP:0356
+MOV20				  Near	 _TEXT:01A2
+MOV21				  Near	 _TEXT:01BB
+MOV3				  Near	 _TEXT:01D4
+MOV40				  Near	 _TEXT:01F1
+MOV41				  Near	 _TEXT:020E
+MOV50				  Near	 _TEXT:022B
+MOV51				  Near	 _TEXT:0248
+MOV60				  Near	 _TEXT:0265
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 36
+Symbol Table
+
+
+
+MOV61				  Near	 _TEXT:0282
+MOV8				  Near	 _TEXT:014E
+MOV9				  Near	 _TEXT:0162
+MOVA				  Near	 _TEXT:0178
+MOVADRESAVIMOBAITAS		  Near	 _TEXT:0323
+MOVB				  Near	 _TEXT:018E
+MOVKOMANDA			  Byte	 DGROUP:010F
+MSG				  Byte	 DGROUP:0125
+NE000				  Near	 _TEXT:077E
+NE0000				  Near	 _TEXT:0444
+NE0001				  Near	 _TEXT:04F7
+NE001				  Near	 _TEXT:0797
+NE0010				  Near	 _TEXT:045A
+NE0011				  Near	 _TEXT:0510
+NE002				  Near	 _TEXT:07B0
+NE003				  Near	 _TEXT:07C9
+NE004				  Near	 _TEXT:07E2
+NE005				  Near	 _TEXT:07FB
+NE006				  Near	 _TEXT:0814
+NE007				  Near	 _TEXT:082D
+NE010				  Near	 _TEXT:0843
+NE0100				  Near	 _TEXT:0470
+NE0101				  Near	 _TEXT:0529
+NE011				  Near	 _TEXT:0856
+NE0110				  Near	 _TEXT:0486
+NE0111				  Near	 _TEXT:0542
+NE012				  Near	 _TEXT:0869
+NE013				  Near	 _TEXT:087C
+NE014				  Near	 _TEXT:088F
+NE015				  Near	 _TEXT:08A2
+NE016				  Near	 _TEXT:08B5
+NE017				  Near	 _TEXT:08C8
+NE100				  Near	 _TEXT:08DB
+NE1000				  Near	 _TEXT:049C
+NE1001				  Near	 _TEXT:055B
+NE101				  Near	 _TEXT:08EE
+NE1010				  Near	 _TEXT:04B2
+NE1011				  Near	 _TEXT:0574
+NE102				  Near	 _TEXT:0901
+NE103				  Near	 _TEXT:0914
+NE104				  Near	 _TEXT:0927
+NE105				  Near	 _TEXT:093A
+NE106				  Near	 _TEXT:094D
+NE107				  Near	 _TEXT:0960
+NE110				  Near	 _TEXT:0976
+NE1100				  Near	 _TEXT:04C8
+NE1101				  Near	 _TEXT:058D
+NE110W1				  Near	 _TEXT:0A3E
+NE111				  Near	 _TEXT:098F
+NE1110				  Near	 _TEXT:04DE
+NE1111				  Near	 _TEXT:05A6
+NE111W1				  Near	 _TEXT:0A57
+NE112				  Near	 _TEXT:09A8
+NE112W1				  Near	 _TEXT:0A70
+NE113				  Near	 _TEXT:09C1
+NE113W1				  Near	 _TEXT:0A89
+NE114				  Near	 _TEXT:09DA
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 37
+Symbol Table
+
+
+
+NE114W1				  Near	 _TEXT:0AA2
+NE115				  Near	 _TEXT:09F3
+NE115W1				  Near	 _TEXT:0ABB
+NE116				  Near	 _TEXT:0A0C
+NE116W1				  Near	 _TEXT:0AD4
+NE117				  Near	 _TEXT:0A25
+NE117W1				  Near	 _TEXT:0AED
+NEATPAZINTA			  Byte	 DGROUP:012A
+NECS				  Near	 _TEXT:0BD4
+NEDS				  Near	 _TEXT:0BE9
+NEES				  Near	 _TEXT:0BBF
+NEMANO				  Near	 _TEXT:008D
+NEMOV				  Near	 _TEXT:0B0F
+NENOT				  Near	 _TEXT:0B27
+NERACS				  Near	 _TEXT:0C3C
+NERADS				  Near	 _TEXT:0C54
+NERAES				  Near	 _TEXT:0C24
+NERASEG				  Near	 _TEXT:0C69
+NERCR0				  Near	 _TEXT:0BAA
+NERCR1				  Near	 _TEXT:0B57
+NESS				  Near	 _TEXT:0BFE
+NEVISKAS			  Near	 _TEXT:0B84
+NEXLAT				  Near	 _TEXT:0B3F
+NOT0				  Near	 _TEXT:029F
+NOT1				  Near	 _TEXT:02AF
+NOTADRESAVIMOBAITAS		  Near	 _TEXT:034C
+NOTKOMANDA			  Byte	 DGROUP:0113
+OPEN				  Near	 _TEXT:004B
+OPERANDAI2			  Near	 _TEXT:05AF
+OPERANDAS1			  Word	 DGROUP:035C
+OPERANDAS2			  Word	 DGROUP:035E
+OUTPUT				  Byte	 DGROUP:0153
+OUT_FH				  Word	 DGROUP:010D
+P0				  Near	 _TEXT:0093
+P1				  Near	 _TEXT:009B
+P10				  Near	 _TEXT:00E3
+P11				  Near	 _TEXT:00EB
+P12				  Near	 _TEXT:00F3
+P13				  Near	 _TEXT:00FB
+P14				  Near	 _TEXT:0103
+P15				  Near	 _TEXT:010B
+P16				  Near	 _TEXT:0113
+P17				  Near	 _TEXT:011B
+P18				  Near	 _TEXT:0123
+P19				  Near	 _TEXT:012B
+P2				  Near	 _TEXT:00A3
+P20				  Near	 _TEXT:0133
+P3				  Near	 _TEXT:00AB
+P4				  Near	 _TEXT:00B3
+P5				  Near	 _TEXT:00BB
+P6				  Near	 _TEXT:00C3
+P7				  Near	 _TEXT:00CB
+P8				  Near	 _TEXT:00D3
+P9				  Near	 _TEXT:00DB
+PABAIGA				  Near	 _TEXT:0136
+PERSOKA1			  Near	 _TEXT:03A1
+PERSOKA11			  Near	 _TEXT:03F1
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 38
+Symbol Table
+
+
+
+PERSOKA12			  Near	 _TEXT:03FB
+PERSOKA13			  Near	 _TEXT:0405
+PERSOKA14			  Near	 _TEXT:040F
+PERSOKA15			  Near	 _TEXT:0419
+PERSOKA16			  Near	 _TEXT:0423
+PERSOKA17			  Near	 _TEXT:042D
+PERSOKA18			  Near	 _TEXT:0437
+PERSOKA2			  Near	 _TEXT:03AB
+PERSOKA21			  Near	 _TEXT:05E1
+PERSOKA22			  Near	 _TEXT:05EB
+PERSOKA23			  Near	 _TEXT:05F5
+PERSOKA24			  Near	 _TEXT:05FF
+PERSOKA25			  Near	 _TEXT:0609
+PERSOKA26			  Near	 _TEXT:0613
+PERSOKA27			  Near	 _TEXT:061D
+PERSOKA28			  Near	 _TEXT:0627
+PERSOKA3			  Near	 _TEXT:03B5
+PERSOKA31			  Near	 _TEXT:0631
+PERSOKA32			  Near	 _TEXT:063B
+PERSOKA33			  Near	 _TEXT:0645
+PERSOKA34			  Near	 _TEXT:064F
+PERSOKA35			  Near	 _TEXT:0659
+PERSOKA36			  Near	 _TEXT:0663
+PERSOKA37			  Near	 _TEXT:066D
+PERSOKA38			  Near	 _TEXT:0677
+PERSOKA4			  Near	 _TEXT:03BF
+PERSOKA41			  Near	 _TEXT:0681
+PERSOKA42			  Near	 _TEXT:068B
+PERSOKA43			  Near	 _TEXT:0695
+PERSOKA44			  Near	 _TEXT:069F
+PERSOKA45			  Near	 _TEXT:06A9
+PERSOKA46			  Near	 _TEXT:06B3
+PERSOKA47			  Near	 _TEXT:06BD
+PERSOKA48			  Near	 _TEXT:06C7
+PERSOKA5			  Near	 _TEXT:03C9
+PERSOKA51			  Near	 _TEXT:06D8
+PERSOKA52			  Near	 _TEXT:06E2
+PERSOKA53			  Near	 _TEXT:06EC
+PERSOKA54			  Near	 _TEXT:06F6
+PERSOKA55			  Near	 _TEXT:0700
+PERSOKA56			  Near	 _TEXT:070A
+PERSOKA57			  Near	 _TEXT:0714
+PERSOKA58			  Near	 _TEXT:071E
+PERSOKA6			  Near	 _TEXT:03D3
+PERSOKA61			  Near	 _TEXT:0728
+PERSOKA62			  Near	 _TEXT:0732
+PERSOKA63			  Near	 _TEXT:073C
+PERSOKA64			  Near	 _TEXT:0746
+PERSOKA65			  Near	 _TEXT:0750
+PERSOKA66			  Near	 _TEXT:075A
+PERSOKA67			  Near	 _TEXT:0764
+PERSOKA68			  Near	 _TEXT:076E
+PERSOKA7			  Near	 _TEXT:03DD
+PERSOKA8			  Near	 _TEXT:03E7
+PERSOKAMOD1			  Near	 _TEXT:05B9
+PERSOKAMOD2			  Near	 _TEXT:05C3
+PERSOKAMOD3			  Near	 _TEXT:05CD
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 39
+Symbol Table
+
+
+
+PERSOKAMOD4			  Near	 _TEXT:05D7
+PLIUSAS				  Byte	 DGROUP:0129
+POSLINKIS1			  Byte	 DGROUP:0359
+POSLINKIS2			  Word	 DGROUP:035A
+PRADZIA				  Near	 _TEXT:0012
+PREF1				  Near	 _TEXT:0D39
+PREF2				  Near	 _TEXT:0D48
+PREF3				  Near	 _TEXT:0D57
+PREF4				  Near	 _TEXT:0D66
+PREFCOMPARE			  Near	 _TEXT:0D16
+PRINTHEX			  Near	 _TEXT:0CDF
+RCR00				  Near	 _TEXT:02D7
+RCR01				  Near	 _TEXT:02E7
+RCR1				  Byte	 DGROUP:0123
+RCR10				  Near	 _TEXT:02F7
+RCR11				  Near	 _TEXT:030D
+RCRADRESAVIMOBAITAS		  Near	 _TEXT:0374
+RCRKOMANDA			  Byte	 DGROUP:011C
+READ				  Near	 _TEXT:0063
+REG				  Byte	 DGROUP:0357
+REG000W0			  Near	 _TEXT:0437
+REG000W1			  Near	 _TEXT:04E7
+REG001W0			  Near	 _TEXT:044D
+REG001W1			  Near	 _TEXT:0500
+REG010W0			  Near	 _TEXT:0463
+REG010W1			  Near	 _TEXT:0519
+REG011W0			  Near	 _TEXT:0479
+REG011W1			  Near	 _TEXT:0532
+REG100W0			  Near	 _TEXT:048F
+REG100W1			  Near	 _TEXT:054B
+REG101W0			  Near	 _TEXT:04A5
+REG101W1			  Near	 _TEXT:0564
+REG110W0			  Near	 _TEXT:04BB
+REG110W1			  Near	 _TEXT:057D
+REG111W0			  Near	 _TEXT:04D1
+REG111W1			  Near	 _TEXT:0596
+RM				  Byte	 DGROUP:0358
+RM000MOD00			  Near	 _TEXT:076E
+RM000MOD01			  Near	 _TEXT:0836
+RM000MOD10			  Near	 _TEXT:08CE
+RM000MOD11			  Near	 _TEXT:0966
+RM000MOD11W1			  Near	 _TEXT:0A2E
+RM001MOD00			  Near	 _TEXT:0787
+RM001MOD01			  Near	 _TEXT:0849
+RM001MOD10			  Near	 _TEXT:08E1
+RM001MOD11			  Near	 _TEXT:097F
+RM001MOD11W1			  Near	 _TEXT:0A47
+RM010MOD00			  Near	 _TEXT:07A0
+RM010MOD01			  Near	 _TEXT:085C
+RM010MOD10			  Near	 _TEXT:08F4
+RM010MOD11			  Near	 _TEXT:0998
+RM010MOD11W1			  Near	 _TEXT:0A60
+RM011MOD00			  Near	 _TEXT:07B9
+RM011MOD01			  Near	 _TEXT:086F
+RM011MOD10			  Near	 _TEXT:0907
+RM011MOD11			  Near	 _TEXT:09B1
+RM011MOD11W1			  Near	 _TEXT:0A79
+Turbo Assembler	 Version 3.1	    01/03/21 20:58:06	    Page 40
+Symbol Table
+
+
+
+RM100MOD00			  Near	 _TEXT:07D2
+RM100MOD01			  Near	 _TEXT:0882
+RM100MOD10			  Near	 _TEXT:091A
+RM100MOD11			  Near	 _TEXT:09CA
+RM100MOD11W1			  Near	 _TEXT:0A92
+RM101MOD00			  Near	 _TEXT:07EB
+RM101MOD01			  Near	 _TEXT:0895
+RM101MOD10			  Near	 _TEXT:092D
+RM101MOD11			  Near	 _TEXT:09E3
+RM101MOD11W1			  Near	 _TEXT:0AAB
+RM110MOD00			  Near	 _TEXT:0804
+RM110MOD01			  Near	 _TEXT:08A8
+RM110MOD10			  Near	 _TEXT:0940
+RM110MOD11			  Near	 _TEXT:09FC
+RM110MOD11W1			  Near	 _TEXT:0AC4
+RM111MOD00			  Near	 _TEXT:081D
+RM111MOD01			  Near	 _TEXT:08BB
+RM111MOD10			  Near	 _TEXT:0953
+RM111MOD11			  Near	 _TEXT:0A15
+RM111MOD11W1			  Near	 _TEXT:0ADD
+SIOP				  Byte	 DGROUP:0360
+SPACE				  Byte	 DGROUP:0120
+SSPREF				  Byte	 DGROUP:0152
+SSPREFIKSAS			  Byte	 DGROUP:014A
+START				  Near	 _TEXT:0000
+TARPAS				  Byte	 DGROUP:0121
+VISKAS				  Near	 _TEXT:0CC7
+W				  Byte	 DGROUP:0355
+W0				  Near	 _TEXT:0397
+W1				  Near	 _TEXT:03E7
+XLAT1				  Near	 _TEXT:02BF
+XLATKOMANDA			  Byte	 DGROUP:0117
+YRA				  Near	 _TEXT:0025
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  STACK				  16  0100 Para	  Stack	  STACK
+  _DATA				  16  0377 Word	  Public  DATA
+_TEXT				  16  0D67 Word	  Public  CODE
+
