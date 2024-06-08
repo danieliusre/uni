@@ -1,0 +1,102 @@
+# depslib dependency file v1.0
+1669651130 source:c:\users\vreku\desktop\winapi\game\menu.rc
+	"menu.h"
+
+1669904250 c:\users\vreku\desktop\winapi\game\menu.h
+	<windows.h>
+	<winuser.h>
+
+1669908697 source:c:\users\vreku\desktop\winapi\game\main.cpp
+	<iostream>
+	<ctime>
+	<cstdlib>
+	<string>
+	<tchar.h>
+	<ctime>
+	<cstdlib>
+	<windows.h>
+	"timers.h"
+	"radio.h"
+	"menu.h"
+	"files.h"
+	<stdio.h>
+	<unistd.h>
+
+1669649194 c:\users\vreku\desktop\winapi\game\timers.h
+	<windows.h>
+	<winuser.h>
+
+1669648969 c:\users\vreku\desktop\winapi\game\files.h
+
+1669907355 c:\users\vreku\desktop\winapi\game\radio.h
+	<windows.h>
+
+1669902993 source:c:\users\vreku\desktop\winapi\game\untitled1.cpp
+	<tchar.h>
+	<windows.h>
+
+1670018290 source:c:\users\danieliusr\desktop\winapi\menu.rc
+	"radio.h"
+	"menu.h"
+
+1669996242 c:\users\danieliusr\desktop\winapi\menu.h
+	<windows.h>
+	<winuser.h>
+
+1670019159 source:c:\users\danieliusr\desktop\winapi\main.cpp
+	<iostream>
+	<ctime>
+	<cstdlib>
+	<string>
+	<tchar.h>
+	<ctime>
+	<cstdlib>
+	<windows.h>
+	"timers.h"
+	"radio.h"
+	"menu.h"
+	"files.h"
+	<stdio.h>
+	<unistd.h>
+
+1669996243 c:\users\danieliusr\desktop\winapi\timers.h
+	<windows.h>
+	<winuser.h>
+
+1670017938 c:\users\danieliusr\desktop\winapi\radio.h
+	<windows.h>
+
+1669996238 c:\users\danieliusr\desktop\winapi\files.h
+
+1670774371 source:c:\users\danie\desktop\winapi\menu.rc
+	"radio.h"
+	"menu.h"
+
+1670775657 c:\users\danie\desktop\winapi\radio.h
+	<windows.h>
+
+1670775577 c:\users\danie\desktop\winapi\menu.h
+	<windows.h>
+	<winuser.h>
+
+1670775444 source:c:\users\danie\desktop\winapi\main.cpp
+	<iostream>
+	<ctime>
+	<cstdlib>
+	<string>
+	<tchar.h>
+	<ctime>
+	<cstdlib>
+	<windows.h>
+	"radio.h"
+	"menu.h"
+	"files.h"
+	<stdio.h>
+	<unistd.h>
+	"main.h"
+
+1670775676 c:\users\danie\desktop\winapi\files.h
+
+1670774799 c:\users\danie\desktop\winapi\main.h
+	<windows.h>
+
